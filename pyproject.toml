@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.12"
 jinja2 = "^3.1.4"
 debugpy = {version = "^1.8.6", optional = true}
+dynaconf = "^3.2.6"
 
 [tool.poetry.extras]
 dev = [
