@@ -1,7 +1,7 @@
 <STMTTRN>
-<TRNTYPE>{{trn_type}}
-<DTPOSTED>{{dt_posted}}
-<TRNAMT>{{amount}}
-<FITID>{{fitid}}
-<NAME>{{desc}}
+<TRNTYPE>{{trn_type}}</TRNTYPE>
+<DTPOSTED>{{dt_posted}}</DTPOSTED>
+<TRNAMT>{{amount}}</TRNAMT>
+<FITID>{{fitid}}</FITID>
+<NAME>{{desc}}</NAME>
 </STMTTRN>
