@@ -1,0 +1,22 @@
+default:
+  accounts:
+    xpi-investimentos:
+      lang: por
+      cur: brl
+      fi:
+        id: 102
+        org: SC XP Investimentos
+      account:
+        branch: 0001
+        id: 2187146
+        type: checking
+    xpi-conta:
+      lang: por
+      cur: brl
+      fi:
+        id: 348
+        org: Banco XP S.A.
+      account:
+        branch: 0001
+        id: 2187146
+        type: checking
