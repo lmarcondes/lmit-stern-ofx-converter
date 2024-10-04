@@ -1,6 +1,10 @@
 default:
   accounts:
     xpi-investimentos:
+      files:
+        format: csv
+        in: ../statements/xpi/investimentos/csv
+        out: ../statements/xpi/investimentos/ofx
       lang: por
       cur: brl
       fi:
@@ -11,6 +15,10 @@ default:
         id: 2187146
         type: checking
     xpi-conta:
+      files:
+        format: csv
+        in: ../statements/xpi/conta/csv
+        out: ../statements/xpi/conta/ofx
       lang: por
       cur: brl
       fi:
