@@ -1,0 +1,13 @@
+</BANKTRANLIST>
+<LEDGERBAL>
+<BALAMT>{{last_balance}}</BALAMT>
+<DTASOF>{{dtend}}</DTASOF>
+</LEDGERBAL>
+<AVAILBAL>
+<BALAMT>{{balance}}
+<DTASOF>{{dtend}}
+</AVAILBAL>
+</STMTRS>
+</STMTTRNRS>
+</BANKMSGSRSV1>
+</OFX>

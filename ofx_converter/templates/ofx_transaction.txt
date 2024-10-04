@@ -1,0 +1,7 @@
+<STMTTRN>
+<TRNTYPE>{{trn_type}}
+<DTPOSTED>{{dt_posted}}
+<TRNAMT>{{amount}}
+<FITID>{{fitid}}
+<NAME>{{desc}}
+</STMTTRN>
