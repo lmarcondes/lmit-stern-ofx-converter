@@ -28,9 +28,9 @@ def read_transactions(file_path) -> list[Transaction | None]:
 def csv_to_ofx(csv_file_path, ofx_file_path):
     template_reader = Templater()
     # Read the OFX header and footer templates
-    ofx_header_template = template_reader.env.get_template("ofx_header.txt")
-    ofx_footer_template = template_reader.env.get_template("ofx_footer.txt")
-    ofx_transaction_template = template_reader.env.get_template("ofx_transaction.txt")
+    ofx_header_template = template_reader.env.get_template("ofx_header.ofx")
+    ofx_footer_template = template_reader.env.get_template("ofx_footer.ofx")
+    ofx_transaction_template = template_reader.env.get_template("ofx_transaction.ofx")
 
     # Read the CSV file
     transactions = sorted(
