@@ -5,6 +5,8 @@ from hashlib import md5
 from base64 import b64encode
 from jinja2 import Template
 
+from ofx_converter.utils import to_ofx_time
+
 
 @dataclass
 class Transaction:
@@ -14,15 +16,13 @@ class Transaction:
     balance: float
     transaction_id: str | None = None
 
-    _timestamp_format = "%Y%m%d%H%M%S"
-
     @property
     def transaction_type(self) -> str:
         return "DEBIT" if self.value < 0 else "CREDIT"
 
     @property
     def ofx_date(self) -> str:
-        return self.timestamp.strftime(self._timestamp_format)
+        return to_ofx_time(self.timestamp)
 
     @property
     def fitid(self) -> str:
