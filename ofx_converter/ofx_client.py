@@ -3,22 +3,25 @@ from functools import reduce
 from jinja2 import Environment, PackageLoader, Template
 
 from ofx_converter.config import get_settings
+from ofx_converter.logger import LogMixin
 from ofx_converter.transaction import Transaction
 from ofx_converter.utils import to_ofx_time
 
 
-class OfxClient:
+class OfxClient(LogMixin):
     _header_template = "ofx_header.ofx"
     _footer_template = "ofx_footer.ofx"
     _transaction_template = "ofx_transaction.ofx"
 
     def __init__(self, account: str, transactions: list[Transaction]) -> None:
+        super().__init__()
         self.dtnow = datetime.now().astimezone()
         self._template_reader = Environment(loader=PackageLoader("ofx_converter"))
         self.transactions = sorted(transactions)
         self._settings = get_settings()
         self._account = account
         self._account_settings = self._settings['accounts'][account]
+        self.log.info("Creating ofx client for account %s", self._account)
 
     @property
     def header_template(self) -> Template:
@@ -69,6 +72,7 @@ class OfxClient:
         return str(self._account_settings["cur"]).upper()
 
     def make_ofx_header(self) -> str:
+        self.log.info("Making OFX header for account %s", self._account)
         dtstart = self.transactions[0].ofx_date
         dtend = self.transactions[-1].ofx_date
         payload = {
@@ -88,6 +92,7 @@ class OfxClient:
         return header
 
     def make_ofx_transactions(self) -> list[str]:
+        self.log.info("Making OFX transactions for account %s", self._account)
         ofx_transactions = list(
             map(
                 lambda x: x.make_ofx_transaction(self.transaction_template),
@@ -97,12 +102,14 @@ class OfxClient:
         return ofx_transactions
 
     def make_ofx_footer(self) -> str:
+        self.log.info("Making OFX footer for account %s", self._account)
         dtend = self.transactions[-1].ofx_date
         last_balance = self.transactions[-1].balance
         footer = self.footer_template.render(last_balance=last_balance, dtend=dtend)
         return footer
 
     def make_ofx_file(self) -> str:
+        self.log.info("Making OFX file for account %s", self._account)
         reducer = lambda x, y: x + "\n" + y
         body = reduce(reducer, self.make_ofx_transactions())
         header = self.make_ofx_header()

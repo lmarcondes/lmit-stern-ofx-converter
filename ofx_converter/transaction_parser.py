@@ -1,12 +1,14 @@
 from re import compile
 from datetime import datetime
-from typing import Any
+from typing import Any, Iterable
 from functools import reduce
 from collections.abc import Callable
+
+from ofx_converter.logger import LogMixin
 from .transaction import Transaction
 
 
-class TransactionParser:
+class TransactionParser(LogMixin):
     DATE_COL = "Data"
     DESCRIPTION_COL = "Descricao"
     VALUE_COL = "Valor"
@@ -15,6 +17,7 @@ class TransactionParser:
     _value_pattern = "(?P<sign>-)?R\\$ (?P<value>[\\d\\.,]+)$"
 
     def __init__(self) -> None:
+        super().__init__()
         self._date_regex = compile(self._date_pattern)
         self._value_regex = compile(self._value_pattern)
 
@@ -61,3 +64,8 @@ class TransactionParser:
             return None
         transaction = Transaction(date_parsed, desc, value_converted, balance_converted)  # type: ignore
         return transaction
+
+    def parse_multiple(self, records: Iterable[dict[str, Any]]) -> list[Transaction | None]:
+        transactions = list(map(self.parse, records))
+        self.log.info("Parsed %i records into transactions", len(transactions))
+        return transactions
