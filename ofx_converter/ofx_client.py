@@ -20,7 +20,7 @@ class OfxClient(LogMixin):
         self.transactions = sorted(transactions)
         self._settings = get_settings()
         self._account = account
-        self._account_settings = self._settings['accounts'][account]
+        self._account_settings = self._settings["accounts"][account]
         self.log.info("Creating ofx client for account %s", self._account)
 
     @property
@@ -49,7 +49,7 @@ class OfxClient(LogMixin):
 
     @property
     def bankid(self) -> str:
-        return str(self._account_settings["fi"]["id"]).rjust(4,"0")
+        return str(self._account_settings["fi"]["id"]).rjust(4, "0")
 
     @property
     def branchid(self) -> str:
