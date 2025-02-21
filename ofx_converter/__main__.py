@@ -41,20 +41,16 @@ def csv_to_ofx(account: Account, csv_file_path: Path, ofx_file_path: Path):
     logger.info("Converting from %s to %s", csv_file_path, ofx_file_path)
     parser = TransactionParserFactory().make(account)
 
-    transactions = sorted(
-        [
-            x
-            for x in read_transactions(parser, csv_file_path.as_posix())
-            if x is not None
-        ]
-    )
+    transactions = [
+        x for x in read_transactions(parser, csv_file_path.as_posix()) if x is not None
+    ]
 
     if len(transactions) == 0:
         return
 
-    ofx_client = OfxClient(account, transactions)
+    ofx_client = OfxClient(account)
 
-    total_file = ofx_client.make_ofx_file()
+    total_file = ofx_client.make_ofx_file(transactions)
 
     # Write the OFX file
     logger.info("Writing OFX file with %i transactions", len(transactions))

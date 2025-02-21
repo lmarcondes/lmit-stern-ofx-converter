@@ -14,11 +14,10 @@ class OfxClient(LogMixin):
     _footer_template = "ofx_footer.ofx"
     _transaction_template = "ofx_transaction.ofx"
 
-    def __init__(self, account: Account, transactions: list[Transaction]) -> None:
+    def __init__(self, account: Account) -> None:
         super().__init__()
         self.dtnow = datetime.now().astimezone()
         self._template_reader = Environment(loader=PackageLoader("ofx_converter"))
-        self.transactions = sorted(transactions)
         self._account = account
         self._account_config = AccountConfig(account)
         self.log.info("Creating ofx client for account %s", self._account)
@@ -39,10 +38,10 @@ class OfxClient(LogMixin):
     def ofx_now(self) -> str:
         return to_ofx_time(self.dtnow)
 
-    def make_ofx_header(self) -> str:
+    def make_ofx_header(self, transactions: list[Transaction]) -> str:
         self.log.info("Making OFX header for account %s", self._account)
-        dtstart = self.transactions[0].ofx_date
-        dtend = self.transactions[-1].ofx_date
+        dtstart = transactions[0].ofx_date
+        dtend = transactions[-1].ofx_date
         payload = {
             "dtnow": self.ofx_now,
             "dtstart": dtstart,
@@ -73,29 +72,30 @@ class OfxClient(LogMixin):
 
         return inner
 
-    def make_ofx_transactions(self) -> list[str]:
+    def make_ofx_transactions(self, transactions: list[Transaction]) -> list[str]:
         self.log.info("Making OFX transactions for account %s", self._account)
         maker = self.make_ofx_transaction(template=self.transaction_template)
         ofx_transactions = list(
             map(
                 maker,
-                self.transactions,
+                transactions,
             )
         )
         return ofx_transactions
 
-    def make_ofx_footer(self) -> str:
+    def make_ofx_footer(self, transactions: list[Transaction]) -> str:
         self.log.info("Making OFX footer for account %s", self._account)
-        dtend = self.transactions[-1].ofx_date
-        last_balance = self.transactions[-1].balance
+        sorted_transactions = sorted(transactions)
+        dtend = sorted_transactions[-1].ofx_date
+        last_balance = sorted_transactions[-1].balance
         footer = self.footer_template.render(last_balance=last_balance, dtend=dtend)
         return footer
 
-    def make_ofx_file(self) -> str:
+    def make_ofx_file(self, transactions: list[Transaction]) -> str:
         self.log.info("Making OFX file for account %s", self._account)
         reducer = lambda x, y: x + "\n" + y
-        body = reduce(reducer, self.make_ofx_transactions())
-        header = self.make_ofx_header()
-        footer = self.make_ofx_footer()
+        body = reduce(reducer, self.make_ofx_transactions(transactions))
+        header = self.make_ofx_header(transactions)
+        footer = self.make_ofx_footer(transactions)
         total_file = reduce(reducer, [header, body, footer])
         return total_file
