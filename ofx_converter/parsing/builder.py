@@ -1,7 +1,7 @@
 
 from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.account_config import AccountConfig
-from ofx_converter.parsing.accounts import Account
+from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.transaction_parser import TransactionParser
 from ofx_converter.parsing.xp_transaction_parser import XPCardTransactionParser, XPTransactionParser
 

@@ -4,11 +4,11 @@ from pathlib import Path
 from ofx_converter.argparser import get_main_parser
 from ofx_converter.logger import get_logger
 from ofx_converter.ofx_client import OfxClient
-from ofx_converter.parsing.accounts import Account
+from ofx_converter.parsing.account import Account
+from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.transaction_parser import TransactionParser
 from ofx_converter.parsing.builder import TransactionParserFactory
 from ofx_converter.parsing.transaction import Transaction
-from .config import get_settings
 
 logger = get_logger("main")
 
@@ -22,16 +22,15 @@ def read_transactions(
     return transactions
 
 
-def init_settings(account: str) -> tuple[Path, Path, str]:
-    settings = get_settings()
-    file_settings = settings["accounts"][account]["files"]
-    input_path = Path(file_settings["in"])
+def init_settings(account: Account) -> tuple[Path, Path, str]:
+    account_config = AccountConfig(account)
+    input_path = Path(account_config.file_in)
     if not input_path.exists():
         raise ValueError(f"Input dir is invalid: {input_path}")
-    output_path = Path(file_settings["out"])
+    output_path = Path(account_config.file_out)
     if not output_path.exists():
         output_path.mkdir(parents=True)
-    file_format = file_settings["format"]
+    file_format = account_config.file_format
     return input_path, output_path, file_format
 
 
@@ -59,15 +58,16 @@ def csv_to_ofx(account: Account, csv_file_path: Path, ofx_file_path: Path):
         ofxfile.close()
 
 
-def run(account: str):
+def run(account: Account):
     input_path, output_path, file_format = init_settings(account)
     input_files = [x for x in input_path.iterdir() if x.suffix.endswith(file_format)]
     for file in input_files:
         output_file = output_path / f"{file.stem}.ofx"
-        csv_to_ofx(Account(account), file, output_file)
+        csv_to_ofx(account, file, output_file)
 
 
 if __name__ == "__main__":
     parser = get_main_parser()
     args, _ = parser.parse_known_args()
-    run(args.account)
+    account = Account(args.account)
+    run(account)

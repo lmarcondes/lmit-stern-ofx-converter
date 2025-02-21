@@ -1,7 +1,7 @@
 
 from ofx_converter.config import get_settings
 from ofx_converter.parsing.account_type import AccountType
-from ofx_converter.parsing.accounts import Account
+from ofx_converter.parsing.account import Account
 
 
 class AccountConfig:
@@ -21,15 +21,15 @@ class AccountConfig:
         return account_type
 
     @property
-    def file_format(self):
+    def file_format(self) -> str:
         return self._account_settings["files"]["format"]
 
     @property
-    def file_in(self):
+    def file_in(self) -> str:
         return self._account_settings["files"]["in"]
 
     @property
-    def file_out(self):
+    def file_out(self) -> str:
         return self._account_settings["files"]["out"]
 
     @property
