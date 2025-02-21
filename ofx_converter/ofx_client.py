@@ -59,11 +59,26 @@ class OfxClient(LogMixin):
         header = self.header_template.render(**payload)
         return header
 
+    def make_ofx_transaction(self, template: Template):
+        def inner(t: Transaction) -> str:
+            payload = {
+                "trn_type": t.transaction_type,
+                "dt_posted": t.ofx_date,
+                "amount": t.value,
+                "desc": t.description,
+                "fitid": t.fitid,
+            }
+            trn_formatted = template.render(**payload)
+            return trn_formatted
+
+        return inner
+
     def make_ofx_transactions(self) -> list[str]:
         self.log.info("Making OFX transactions for account %s", self._account)
+        maker = self.make_ofx_transaction(template=self.transaction_template)
         ofx_transactions = list(
             map(
-                lambda x: x.make_ofx_transaction(self.transaction_template),
+                maker,
                 self.transactions,
             )
         )
