@@ -1,7 +1,8 @@
 from re import compile
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
+from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.parsing.transaction_parser import TransactionParser
 
@@ -14,8 +15,8 @@ class XPTransactionParser(TransactionParser):
     _date_pattern = "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{2})[\\s\\w]+(?P<hour>\\d{2}):(?P<min>\\d{2}):(?P<sec>\\d{2})$"
     _value_pattern = "(?P<sign>-)?R\\$ (?P<value>[\\d\\.,]+)$"
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, account: AccountConfig) -> None:
+        super().__init__(account)
         self._date_regex = compile(self._date_pattern)
         self._value_regex = compile(self._value_pattern)
 
@@ -35,9 +36,7 @@ class XPTransactionParser(TransactionParser):
         date_converted = datetime.fromisoformat(date_string)
         return date_converted
 
-    def _parse_money(self, value: str | None) -> float | None:
-        if value is None:
-            return None
+    def _extract_value(self, value: str) -> float | None:
         value_obj = self._value_regex.match(value)
         if value_obj is None:
             return None
@@ -50,6 +49,22 @@ class XPTransactionParser(TransactionParser):
             )
         )
         return value_converted
+
+    def _get_credit_debit_sign(self) -> Literal[-1, 1]:
+        if self._account_config.account_type.is_liability:
+            sign = -1
+        else:
+            sign = 1
+        return sign
+
+    def _parse_money(self, value: str | None) -> float | None:
+        if value is None:
+            return None
+        value_converted = self._extract_value(value)
+        if value_converted is None:
+            return None
+        value_signed = self._get_credit_debit_sign() * value_converted
+        return value_signed
 
     def parse(self, record: dict[str, Any]) -> Transaction | None:
         (date, desc, value, balance) = (

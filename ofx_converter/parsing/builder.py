@@ -1,5 +1,6 @@
 
 from ofx_converter.logger import LogMixin
+from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.accounts import Account
 from ofx_converter.parsing.transaction_parser import TransactionParser
 from ofx_converter.parsing.xp_transaction_parser import XPCardTransactionParser, XPTransactionParser
@@ -8,7 +9,11 @@ from ofx_converter.parsing.xp_transaction_parser import XPCardTransactionParser,
 class TransactionParserFactory(LogMixin):
 
     def make(self, account: Account) -> TransactionParser:
+        account_config = AccountConfig(account)
         if account == Account.XP_CONTA :
-            return XPTransactionParser()
+            parser = XPTransactionParser(account_config)
         elif account == Account.XP_CARTAO:
-            return XPCardTransactionParser()
+            parser = XPCardTransactionParser(account_config)
+        elif account == Account.XP_INVESTIMENTOS:
+            parser = XPTransactionParser(account_config)
+        return parser

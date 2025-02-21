@@ -2,8 +2,8 @@ from datetime import datetime
 from functools import reduce
 from jinja2 import Environment, PackageLoader, Template
 
-from ofx_converter.config import get_settings
 from ofx_converter.logger import LogMixin
+from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.accounts import Account
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.utils import to_ofx_time
@@ -19,9 +19,8 @@ class OfxClient(LogMixin):
         self.dtnow = datetime.now().astimezone()
         self._template_reader = Environment(loader=PackageLoader("ofx_converter"))
         self.transactions = sorted(transactions)
-        self._settings = get_settings()
         self._account = account
-        self._account_settings = self._settings["accounts"][account.value]
+        self._account_config = AccountConfig(account)
         self.log.info("Creating ofx client for account %s", self._account)
 
     @property
@@ -40,38 +39,6 @@ class OfxClient(LogMixin):
     def ofx_now(self) -> str:
         return to_ofx_time(self.dtnow)
 
-    @property
-    def fiorg(self) -> str:
-        return self._account_settings["fi"]["org"]
-
-    @property
-    def fiid(self) -> str:
-        return self._account_settings["fi"]["id"]
-
-    @property
-    def bankid(self) -> str:
-        return str(self._account_settings["fi"]["id"]).rjust(4, "0")
-
-    @property
-    def branchid(self) -> str:
-        return self._account_settings["account"]["branch"]
-
-    @property
-    def acctid(self) -> str:
-        return self._account_settings["account"]["id"]
-
-    @property
-    def accttype(self) -> str:
-        return str(self._account_settings["account"]["type"]).upper()
-
-    @property
-    def lang(self) -> str:
-        return str(self._account_settings["lang"]).upper()
-
-    @property
-    def cur(self) -> str:
-        return str(self._account_settings["cur"]).upper()
-
     def make_ofx_header(self) -> str:
         self.log.info("Making OFX header for account %s", self._account)
         dtstart = self.transactions[0].ofx_date
@@ -80,14 +47,14 @@ class OfxClient(LogMixin):
             "dtnow": self.ofx_now,
             "dtstart": dtstart,
             "dtend": dtend,
-            "fiorg": self.fiorg,
-            "fiid": self.fiid,
-            "bankid": self.bankid,
-            "branchid": self.branchid,
-            "acctid": self.acctid,
-            "accttype": self.accttype,
-            "lang": self.lang,
-            "cur": self.cur,
+            "fiorg": self._account_config.fiorg,
+            "fiid": self._account_config.fiid,
+            "bankid": self._account_config.bankid,
+            "branchid": self._account_config.branchid,
+            "acctid": self._account_config.acctid,
+            "accttype": self._account_config.accttype,
+            "lang": self._account_config.lang,
+            "cur": self._account_config.cur,
         }
         header = self.header_template.render(**payload)
         return header
