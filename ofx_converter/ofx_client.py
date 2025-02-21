@@ -4,7 +4,8 @@ from jinja2 import Environment, PackageLoader, Template
 
 from ofx_converter.config import get_settings
 from ofx_converter.logger import LogMixin
-from ofx_converter.transaction import Transaction
+from ofx_converter.parsing.accounts import Account
+from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.utils import to_ofx_time
 
 
@@ -13,14 +14,14 @@ class OfxClient(LogMixin):
     _footer_template = "ofx_footer.ofx"
     _transaction_template = "ofx_transaction.ofx"
 
-    def __init__(self, account: str, transactions: list[Transaction]) -> None:
+    def __init__(self, account: Account, transactions: list[Transaction]) -> None:
         super().__init__()
         self.dtnow = datetime.now().astimezone()
         self._template_reader = Environment(loader=PackageLoader("ofx_converter"))
         self.transactions = sorted(transactions)
         self._settings = get_settings()
         self._account = account
-        self._account_settings = self._settings["accounts"][account]
+        self._account_settings = self._settings["accounts"][account.value]
         self.log.info("Creating ofx client for account %s", self._account)
 
     @property

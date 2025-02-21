@@ -1,6 +1,6 @@
 from datetime import datetime
-from typing import Any
-from dataclasses import dataclass
+from functools import reduce
+from typing import Any, Callable
 from hashlib import md5
 from base64 import b64encode
 from jinja2 import Template
@@ -8,13 +8,20 @@ from jinja2 import Template
 from ofx_converter.utils import to_ofx_time
 
 
-@dataclass
 class Transaction:
-    timestamp: datetime
-    description: str
-    value: float
-    balance: float
-    transaction_id: str | None = None
+    def __init__(
+        self,
+        timestamp: datetime,
+        description: str,
+        value: float,
+        balance: float | None = None,
+        transaction_id: str | None = None,
+    ) -> None:
+        self.timestamp = timestamp
+        self.description = description
+        self.value = value
+        self.balance = balance
+        self.transaction_id = transaction_id
 
     @property
     def transaction_type(self) -> str:
@@ -53,3 +60,18 @@ class Transaction:
             return self.timestamp < other.timestamp
         else:
             raise ValueError(f"Can't compare Transaction to type {type(other)}")
+
+    def __str__(self) -> str:
+        return f"Transaction(date:{self.timestamp},desc:{self.description},value:{self.value})"
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
+    @property
+    def is_valid(self):
+        valid_conversions = map(
+            lambda x: x is not None, [self.timestamp, self.description, self.value]
+        )
+        reducer: Callable[[bool, bool], bool] = lambda x, y: x and y
+        is_valid_transaction = reduce(reducer, valid_conversions)
+        return is_valid_transaction

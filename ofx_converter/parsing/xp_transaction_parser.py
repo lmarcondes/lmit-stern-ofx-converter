@@ -1,14 +1,12 @@
 from re import compile
 from datetime import datetime
-from typing import Any, Iterable
-from functools import reduce
-from collections.abc import Callable
+from typing import Any
 
-from ofx_converter.logger import LogMixin
-from .transaction import Transaction
+from ofx_converter.parsing.transaction import Transaction
+from ofx_converter.parsing.transaction_parser import TransactionParser
 
 
-class TransactionParser(LogMixin):
+class XPTransactionParser(TransactionParser):
     DATE_COL = "Data"
     DESCRIPTION_COL = "Descricao"
     VALUE_COL = "Valor"
@@ -21,17 +19,25 @@ class TransactionParser(LogMixin):
         self._date_regex = compile(self._date_pattern)
         self._value_regex = compile(self._value_pattern)
 
-    def _parse_date(self, date: str) -> datetime | None:
+    def _make_iso_string(self, **match_dict: str) -> str:
+        date_string = "20{year}-{month}-{day}T{hour}:{min}:{sec}.000-03:00".format(
+            **match_dict
+        )
+        return date_string
+
+    def _parse_date(self, date: str | None) -> datetime | None:
+        if date is None:
+            return None
         date_obj = self._date_regex.match(date)
         if date_obj is None:
             return None
-        date_string = "20{year}-{month}-{day}T{hour}:{min}:{sec}.000-03:00".format(
-            **date_obj.groupdict()
-        )
+        date_string = self._make_iso_string(**date_obj.groupdict())
         date_converted = datetime.fromisoformat(date_string)
         return date_converted
 
-    def _parse_money(self, value: str) -> float | None:
+    def _parse_money(self, value: str | None) -> float | None:
+        if value is None:
+            return None
         value_obj = self._value_regex.match(value)
         if value_obj is None:
             return None
@@ -47,25 +53,25 @@ class TransactionParser(LogMixin):
 
     def parse(self, record: dict[str, Any]) -> Transaction | None:
         (date, desc, value, balance) = (
-            record[self.DATE_COL],
-            record[self.DESCRIPTION_COL],
-            record[self.VALUE_COL],
-            record[self.BALANCE_COL],
+            record.get(self.DATE_COL),
+            record.get(self.DESCRIPTION_COL),
+            record.get(self.VALUE_COL),
+            record.get(self.BALANCE_COL),
         )
         date_parsed = self._parse_date(date)
         value_converted = self._parse_money(value)
         balance_converted = self._parse_money(balance)
-        valid_conversions = map(
-            lambda x: x is not None, [date_parsed, value_converted, balance_converted]
-        )
-        reducer: Callable[[bool, bool], bool] = lambda x, y: x and y
-        is_valid_transaction = reduce(reducer, valid_conversions)
-        if not is_valid_transaction:
-            return None
         transaction = Transaction(date_parsed, desc, value_converted, balance_converted)  # type: ignore
+        self._log.info(str(transaction))
+        if not transaction.is_valid:
+            return None
         return transaction
 
-    def parse_multiple(self, records: Iterable[dict[str, Any]]) -> list[Transaction | None]:
-        transactions = list(map(self.parse, records))
-        self.log.info("Parsed %i records into transactions", len(transactions))
-        return transactions
+
+class XPCardTransactionParser(XPTransactionParser):
+    DESCRIPTION_COL = "Estabelecimento"
+    _date_pattern = "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{4})$"
+
+    def _make_iso_string(self, **match_dict: str) -> str:
+        date_string = "{year}-{month}-{day}".format(**match_dict)
+        return date_string
