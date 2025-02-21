@@ -1,7 +1,7 @@
 </BANKTRANLIST>
 <LEDGERBAL>
-<BALAMT>{{last_balance}}</BALAMT>
-<DTASOF>{{dtend}}</DTASOF>
+<BALAMT>{{ last_balance if last_balance }}</BALAMT>
+<DTASOF>{{ dtend if dtend }}</DTASOF>
 </LEDGERBAL>
 </STMTRS>
 </STMTTRNRS>
