@@ -4,6 +4,7 @@ from pathlib import Path
 from ofx_converter.argparser import get_main_parser
 from ofx_converter.logger import get_logger
 from ofx_converter.ofx_client import OfxClient
+
 from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.transaction_parser import TransactionParser
