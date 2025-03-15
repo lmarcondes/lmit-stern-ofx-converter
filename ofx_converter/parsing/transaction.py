@@ -1,8 +1,9 @@
 from datetime import datetime
-from functools import reduce
+from functools import cached_property, reduce
 from typing import Any, Callable
 from hashlib import md5
 from base64 import b64encode
+from decimal import Decimal
 
 from ofx_converter.utils import to_ofx_time
 
@@ -12,15 +13,26 @@ class Transaction:
         self,
         timestamp: datetime,
         description: str,
-        value: float,
-        balance: float | None = None,
+        value: Decimal | float,
+        balance: Decimal | None = None,
         transaction_id: str | None = None,
     ) -> None:
         self.timestamp = timestamp
         self.description = description
-        self.value = value
-        self.balance = balance
+        self._value = value
+        self._balance = balance
         self.transaction_id = transaction_id
+
+    @cached_property
+    def value(self) -> Decimal:
+        return Decimal(self._value).quantize(Decimal('0.01'))
+
+    @cached_property
+    def balance(self) -> Decimal | None:
+        balance = self._balance
+        if balance is None:
+            return
+        return balance.quantize(Decimal('0.01'))
 
     @property
     def transaction_type(self) -> str:
