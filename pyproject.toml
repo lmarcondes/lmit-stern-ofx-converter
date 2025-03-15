@@ -10,6 +10,7 @@ python = "^3.12"
 jinja2 = "^3.1.4"
 debugpy = {version = "^1.8.6", optional = true}
 dynaconf = "^3.2.6"
+pytest = "^8.3.5"
 
 [tool.poetry.extras]
 test = [
