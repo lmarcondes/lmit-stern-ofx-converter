@@ -1,5 +1,4 @@
 from re import compile
-from datetime import datetime
 from typing import Any
 
 from ofx_converter.parsing.account_config import AccountConfig

@@ -1,9 +1,14 @@
 default:
   converter:
+    log:
+      level: 1
     accounts:
       xpi-investimentos:
         files:
           format: csv
+          options:
+            delimiter: ;
+            encoding: utf-8-sig
           in: ../statements/personal/xpi/investimentos/csv
           out: ../statements/personal/xpi/investimentos/ofx
         lang: por
