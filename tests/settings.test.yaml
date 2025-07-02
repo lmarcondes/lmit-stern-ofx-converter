@@ -1,5 +1,7 @@
 default:
   converter:
+    log:
+      level: 1
     accounts:
       xpi-investimentos:
         files:
@@ -32,6 +34,9 @@ default:
       xpi-cartao:
         files:
           format: csv
+          options:
+            delimiter: ;
+            encoding: utf-8-sig
           in: ../statements/personal/xpi/cartao/csv
           out: ../statements/personal/xpi/cartao/ofx
         lang: por

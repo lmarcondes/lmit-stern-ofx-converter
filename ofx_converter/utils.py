@@ -1,4 +1,4 @@
-
+from enum import Enum
 from datetime import datetime
 
 
@@ -13,3 +13,7 @@ def to_ofx_time(dt: datetime) -> str:
         offset_str = f"[{offset_hours}]"
     final = f"{converted}{offset_str}"
     return final
+
+
+class FileType(Enum):
+    CSV = "csv"
