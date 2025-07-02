@@ -1,28 +1,14 @@
-import csv
 from pathlib import Path
-from warnings import deprecated
 
 from ofx_converter.argparser import get_main_parser
 from ofx_converter.logger import get_logger
 from ofx_converter.ofx_client import OfxClient
 from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
-from ofx_converter.parsing.transaction_parser import TransactionParser
 from ofx_converter.parsing.builder import TransactionParserFactory
-from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.reader_factory import ReaderFactory
 
 logger = get_logger("main")
-
-
-@deprecated("Method should not be used")
-def read_transactions(
-    parser: TransactionParser, file_path: str
-) -> list[Transaction | None]:
-    with open(file_path, newline="", mode="r", encoding="utf-8-sig") as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=";")
-        transactions = parser.parse_multiple(reader)
-    return transactions
 
 
 def init_settings(account: Account) -> AccountConfig:
