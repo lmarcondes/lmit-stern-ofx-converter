@@ -10,7 +10,7 @@ on:
       - 'tests/**'
 
 env:
-  DYNACONF_SETTINGS: tests/settings.test.yaml
+  SETTINGS_FILE_FOR_DYNACONF: tests/settings.test.yaml
 
 jobs:
   test:
