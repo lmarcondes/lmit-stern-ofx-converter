@@ -8,6 +8,6 @@ class AccountType(Enum):
 
     @property
     def is_liability(self) -> bool:
-        if self.name in ['credit-card']:
+        if self in [self.CREDIT_CARD]:
             return True
         return False
