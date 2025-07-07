@@ -30,36 +30,3 @@ bump = true
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
 build-backend = "poetry_dynamic_versioning.backend"
-
-[tool.mypy]
-ignore_missing_imports = true
-# Start off with these
-warn_unused_configs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-
-# Getting this passing should be easy
-strict_equality = true
-
-# Strongly recommend enabling this one as soon as you can
-check_untyped_defs = true
-
-# These shouldn't be too much additional work, but may be tricky to
-# get passing if you use a lot of untyped libraries
-disallow_subclassing_any = true
-disallow_untyped_decorators = true
-disallow_any_generics = true
-
-# These next few are various gradations of forcing use of type annotations
-disallow_untyped_calls = true
-disallow_incomplete_defs = true
-disallow_untyped_defs = true
-
-# This one isn't too hard to get passing, but return on investment is lower
-no_implicit_reexport = true
-
-disable_error_code = comparison-overlap, import-untyped
-
-[tool.mypy-dynaconf.*]
-ignore_missing_imports = true
-disable_error_code = import-not-found
