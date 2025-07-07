@@ -29,9 +29,8 @@ class DateParser(LogMixin, StringParser[datetime]):
             return None
         date_string = self.make_iso_string(**date_obj.groupdict())
         try:
-            date_converted = datetime.fromisoformat(date_string).astimezone(
-                self.timezone
-            )
+            date_converted = datetime.fromisoformat(date_string)
+            date_converted = date_converted.replace(tzinfo=self.timezone)
         except ValueError:
             print_exc()
             self.log.error("Failed converting date %s, returning None", date_string)
