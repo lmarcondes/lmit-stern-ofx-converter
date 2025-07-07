@@ -1,9 +1,10 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
 import re
+from datetime import datetime
+from traceback import print_exc
+from zoneinfo import ZoneInfo
+
 from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.abstract_value_parser import StringParser
-from traceback import print_exc
 
 
 class DateParser(LogMixin, StringParser[datetime]):
@@ -34,7 +35,7 @@ class DateParser(LogMixin, StringParser[datetime]):
         except ValueError:
             print_exc()
             self.log.error("Failed converting date %s, returning None", date_string)
-            return
+            return None
         return date_converted
 
     @staticmethod

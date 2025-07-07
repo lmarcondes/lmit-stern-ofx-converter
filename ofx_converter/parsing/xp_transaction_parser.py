@@ -1,17 +1,16 @@
-from datetime import timedelta
 from re import compile
 from typing import Any
+
+from dateutil.relativedelta import relativedelta
 
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.date_parser import DateParser
 from ofx_converter.parsing.money_parser import MoneyParser
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.parsing.transaction_parser import TransactionParser
-from dateutil.relativedelta import relativedelta
-from re import compile
 
 
-class XPTransactionParser(TransactionParser):
+class XPTransactionParser(TransactionParser[dict[str, Any]]):
     DATE_COL = "Data"
     DESCRIPTION_COL = "Descricao"
     VALUE_COL = "Valor"
@@ -31,12 +30,12 @@ class XPTransactionParser(TransactionParser):
         self, installment_description: str | None
     ) -> tuple[int, int] | None:
         if installment_description is None:
-            return
+            return None
 
         pattern = compile("(\\d+) de (\\d+)")
         match = pattern.match(installment_description)
         if not match:
-            return
+            return None
 
         current_installment = match.group(1)
         last_installment = match.group(2)

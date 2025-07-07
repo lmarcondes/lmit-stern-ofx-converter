@@ -1,30 +1,21 @@
-from abc import ABC, abstractmethod
+from csv import DictReader
 from pathlib import Path
+from typing import Any
 
-from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.parsing.transaction_parser import TransactionParser
-from csv import DictReader
-
-
-class AbstractReader(LogMixin, ABC):
-
-    @abstractmethod
-    def read_transactions(
-        self, parser: TransactionParser, file_path: Path
-    ) -> list[Transaction | None]: ...
-
-
-class BaseReader(AbstractReader):
-
-    def __init__(self, log_level: int | None = None) -> None:
-        super().__init__(log_level)
+from ofx_converter.reader.abstract_reader import BaseReader
 
 
 class CSVReader(BaseReader):
 
     def __init__(
-        self, delimiter: str, encoding: str = "utf-8", quote_char: str = '"', newline=""
+        self,
+        delimiter: str,
+        encoding: str = "utf-8",
+        quote_char: str = '"',
+        newline: str = "",
+        **_: Any
     ) -> None:
         self._delimiter = delimiter
         self._encoding = encoding
@@ -32,7 +23,7 @@ class CSVReader(BaseReader):
         self._newline = newline
 
     def read_transactions(
-        self, parser: TransactionParser, file_path: Path
+        self, parser: TransactionParser[dict[str, Any]], file_path: Path
     ) -> list[Transaction | None]:
         with open(
             file_path, newline=self._newline, mode="r", encoding=self._encoding

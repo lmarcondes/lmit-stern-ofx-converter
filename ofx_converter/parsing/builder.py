@@ -1,19 +1,27 @@
+from typing import Any
 
 from ofx_converter.logger import LogMixin
-from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.account import Account
+from ofx_converter.parsing.account_config import AccountConfig
+from ofx_converter.parsing.ofx_transaction_parser import OfxTransactionParser
 from ofx_converter.parsing.transaction_parser import TransactionParser
-from ofx_converter.parsing.xp_transaction_parser import XPCardTransactionParser, XPTransactionParser
+from ofx_converter.parsing.xp_transaction_parser import (
+    XPCardTransactionParser,
+    XPTransactionParser,
+)
 
 
 class TransactionParserFactory(LogMixin):
 
-    def make(self, account: Account) -> TransactionParser:
-        account_config = AccountConfig(account)
-        if account == Account.XP_CONTA :
-            parser = XPTransactionParser(account_config)
+    def make(self, account_config: AccountConfig) -> TransactionParser[Any]:
+        account = account_config.account
+        if account == Account.XP_CONTA:
+            return XPTransactionParser(account_config)
         elif account == Account.XP_CARTAO:
-            parser = XPCardTransactionParser(account_config)
+            return XPCardTransactionParser(account_config)
         elif account == Account.XP_INVESTIMENTOS:
-            parser = XPTransactionParser(account_config)
-        return parser
+            return XPTransactionParser(account_config)
+        elif account == Account.NUBANK_CARD:
+            return OfxTransactionParser(account_config)
+        else:
+            raise NotImplementedError("Parser for account %s not implemented", account)

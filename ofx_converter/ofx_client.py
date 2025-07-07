@@ -1,10 +1,12 @@
 from datetime import datetime
 from functools import reduce
+from typing import Callable
+
 from jinja2 import Environment, PackageLoader, Template
 
 from ofx_converter.logger import LogMixin
-from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.account import Account
+from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.utils import to_ofx_time
 
@@ -14,13 +16,16 @@ class OfxClient(LogMixin):
     _footer_template = "ofx_footer.ofx"
     _transaction_template = "ofx_transaction.ofx"
 
-    def __init__(self, account: Account) -> None:
+    def __init__(self, account_config: AccountConfig) -> None:
         super().__init__()
         self.dtnow = datetime.now().astimezone()
         self._template_reader = Environment(loader=PackageLoader("ofx_converter"))
-        self._account = account
-        self._account_config = AccountConfig(account)
+        self._account_config = account_config
         self.log.info("Creating ofx client for account %s", self._account)
+
+    @property
+    def _account(self) -> Account:
+        return self._account_config.account
 
     @property
     def header_template(self) -> Template:
@@ -58,7 +63,7 @@ class OfxClient(LogMixin):
         header = self.header_template.render(**payload)
         return header
 
-    def make_ofx_transaction(self, template: Template):
+    def make_ofx_transaction(self, template: Template) -> Callable[[ Transaction ], str]:
         def inner(t: Transaction) -> str:
             payload = {
                 "trn_type": t.transaction_type,
