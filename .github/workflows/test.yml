@@ -2,9 +2,9 @@ name: Test Python Package
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
+    # branches:
+    #   - develop
+    #   - main
     paths:
       - 'ofx_converter/**'
       - 'tests/**'
