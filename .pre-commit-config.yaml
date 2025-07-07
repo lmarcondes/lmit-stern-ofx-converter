@@ -19,9 +19,9 @@ repos:
     rev: v1.16.1 # Use the sha / tag you want to point at
     hooks:
       - id: mypy
-        args:
+        # args:
         # - --strict
-        - --config-file
-        - pyproject.toml
+        # - --config-file
+        # - pyproject.toml
         additional_dependencies:
           - types-python-dateutil

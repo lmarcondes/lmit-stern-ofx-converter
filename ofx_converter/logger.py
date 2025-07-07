@@ -1,6 +1,6 @@
-from abc import ABC
-from logging import Logger, INFO, StreamHandler
 import sys
+from abc import ABC
+from logging import INFO, Logger, StreamHandler
 
 from ofx_converter.config import get_settings
 
