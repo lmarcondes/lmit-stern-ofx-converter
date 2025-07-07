@@ -1,7 +1,10 @@
+from pathlib import Path
+from typing import Any
 
 from ofx_converter.config import get_settings
-from ofx_converter.parsing.account_type import AccountType
 from ofx_converter.parsing.account import Account
+from ofx_converter.parsing.account_type import AccountType
+from ofx_converter.utils import FileType
 
 
 class AccountConfig:
@@ -21,16 +24,20 @@ class AccountConfig:
         return account_type
 
     @property
-    def file_format(self) -> str:
-        return self._account_settings["files"]["format"]
+    def file_format(self) -> FileType:
+        return FileType(self._account_settings["files"]["format"])
 
     @property
-    def file_in(self) -> str:
-        return self._account_settings["files"]["in"]
+    def file_options(self) -> dict[str, Any]:
+        return self._account_settings["files"]["options"]
 
     @property
-    def file_out(self) -> str:
-        return self._account_settings["files"]["out"]
+    def file_in(self) -> Path:
+        return Path(self._account_settings["files"]["in"])
+
+    @property
+    def file_out(self) -> Path:
+        return Path(self._account_settings["files"]["out"])
 
     @property
     def fiorg(self) -> str:
@@ -45,8 +52,8 @@ class AccountConfig:
         return str(self._account_settings["fi"]["id"]).rjust(4, "0")
 
     @property
-    def branchid(self) -> str:
-        return self._account_settings["account"]["branch"]
+    def branchid(self) -> str | None:
+        return self._account_settings["account"].get("branch")
 
     @property
     def acctid(self) -> str:

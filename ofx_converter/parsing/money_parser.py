@@ -1,9 +1,10 @@
+import re
+from decimal import Decimal
 from typing import Literal
+
 from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.abstract_value_parser import StringParser
 from ofx_converter.parsing.account_config import AccountConfig
-from decimal import Decimal
-import re
 
 
 class MoneyParser(LogMixin, StringParser[Decimal]):
@@ -39,7 +40,7 @@ class MoneyParser(LogMixin, StringParser[Decimal]):
         value_signed = self.get_credit_debit_sign() * value_converted
         return value_signed
 
-    def get_credit_debit_sign(self) -> Literal[-1, 1]:
+    def get_credit_debit_sign(self) -> int:
         if self._account_config.account_type.is_liability:
             sign = -1
         else:

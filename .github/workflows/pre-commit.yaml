@@ -1,20 +1,15 @@
-name: Test Python Package
+name: Pre-commit
 
 on:
   pull_request:
-    # branches:
-    #   - develop
-    #   - main
     paths:
       - 'ofx_converter/**'
       - 'tests/**'
 
-env:
-  SETTINGS_FILE_FOR_DYNACONF: tests/settings.test.yaml
-
 jobs:
-  test:
+  pre-commit:
     runs-on: ubuntu-latest
+    name: Run Pre-Commit
 
     steps:
     - name: Checkout code
@@ -25,10 +20,5 @@ jobs:
       with:
         python-version: 3.12.6
 
-    - name: Install Dependencies
-      run: |
-        pip install .
-
-    - name: Run tests
-      run: |
-        pytest -v
+    - name: Run Pre-commit
+      uses: pre-commit/action@v3.0.1

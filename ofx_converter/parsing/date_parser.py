@@ -1,9 +1,10 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
 import re
+from datetime import datetime
+from traceback import print_exc
+from zoneinfo import ZoneInfo
+
 from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.abstract_value_parser import StringParser
-from traceback import print_exc
 
 
 class DateParser(LogMixin, StringParser[datetime]):
@@ -28,13 +29,12 @@ class DateParser(LogMixin, StringParser[datetime]):
             return None
         date_string = self.make_iso_string(**date_obj.groupdict())
         try:
-            date_converted = datetime.fromisoformat(date_string).astimezone(
-                self.timezone
-            )
+            date_converted = datetime.fromisoformat(date_string)
+            date_converted = date_converted.replace(tzinfo=self.timezone)
         except ValueError:
             print_exc()
             self.log.error("Failed converting date %s, returning None", date_string)
-            return
+            return None
         return date_converted
 
     @staticmethod

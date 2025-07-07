@@ -30,8 +30,8 @@ The naming was chosen because I've just re-watched Schindler's List and Stern is
 
 ## TODOS
 
-- Support additional file formats (issue TBD)
-- Support base validations (issue TBD)
+- Support additional file formats: [ADR001](/docs/001-support-additional-filetypes.md)
+- Support base validations (issue TBD): DONE
 
 ## License
 

@@ -1,5 +1,7 @@
 default:
   converter:
+    log:
+      level: 1
     accounts:
       xpi-investimentos:
         files:
@@ -32,6 +34,9 @@ default:
       xpi-cartao:
         files:
           format: csv
+          options:
+            delimiter: ;
+            encoding: utf-8-sig
           in: ../statements/personal/xpi/cartao/csv
           out: ../statements/personal/xpi/cartao/ofx
         lang: por
@@ -42,4 +47,20 @@ default:
         account:
           branch: 0001
           id: 635fc5d6-8a5b-48f3-93ce-a2a0fd6cbfae
+          type: credit-card
+      nubank-cartao:
+        files:
+          format: ofx
+          options:
+            delimiter: ;
+            encoding: utf-8-sig
+          in: ./tests/files/nubank/card
+          out: /tmp/ofx_converter/nubank/card
+        lang: por
+        cur: brl
+        fi:
+          id: 260
+          org: NU PAGAMENTOS S.A.
+        account:
+          id: 61d7badc-f92a-469a-88b2-41a556f2fb29
           type: credit-card
