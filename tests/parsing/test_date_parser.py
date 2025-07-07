@@ -1,12 +1,13 @@
-from datetime import datetime
 import re
+from datetime import datetime
+
 from ofx_converter.parsing.date_parser import DateParser
 from tests.base_test_case import BaseTestCase
 
 
 class DateParserTestCase(BaseTestCase):
 
-    def test_parse_xp_full_date(self):
+    def test_parse_xp_full_date(self) -> None:
         date_regex = re.compile(
             "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{2})[\\s\\w]+(?P<hour>\\d{2}):(?P<min>\\d{2}):(?P<sec>\\d{2})$"
         )
@@ -55,7 +56,7 @@ class DateParserTestCase(BaseTestCase):
             result = parser.parse(input)
             self.assertEqual(result, expected)
 
-    def test_parse_xp_short_date(self):
+    def test_parse_xp_short_date(self) -> None:
         date_regex = re.compile("^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{4})$")
         parser = DateParser(date_regex)
         test_cases = [

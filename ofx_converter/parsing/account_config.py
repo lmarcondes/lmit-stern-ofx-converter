@@ -1,7 +1,9 @@
 from pathlib import Path
+from typing import Any
+
 from ofx_converter.config import get_settings
-from ofx_converter.parsing.account_type import AccountType
 from ofx_converter.parsing.account import Account
+from ofx_converter.parsing.account_type import AccountType
 from ofx_converter.utils import FileType
 
 
@@ -26,7 +28,7 @@ class AccountConfig:
         return FileType(self._account_settings["files"]["format"])
 
     @property
-    def file_options(self) -> dict:
+    def file_options(self) -> dict[str, Any]:
         return self._account_settings["files"]["options"]
 
     @property
@@ -50,8 +52,8 @@ class AccountConfig:
         return str(self._account_settings["fi"]["id"]).rjust(4, "0")
 
     @property
-    def branchid(self) -> str:
-        return self._account_settings["account"]["branch"]
+    def branchid(self) -> str | None:
+        return self._account_settings["account"].get("branch")
 
     @property
     def acctid(self) -> str:

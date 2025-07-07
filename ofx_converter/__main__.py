@@ -22,11 +22,11 @@ def init_settings(account: Account) -> AccountConfig:
     return account_config
 
 
-def file_to_ofx(account_config: AccountConfig, input_path: Path, output_path: Path):
+def file_to_ofx(account_config: AccountConfig, input_path: Path, output_path: Path) -> None:
     # Read the CSV file
-    logger.info("Converting file to OFX for %s account", account)
+    logger.info("Converting file to OFX for %s account", account_config.account)
     logger.info("Converting from %s to %s", input_path, output_path)
-    parser = TransactionParserFactory().make(account)
+    parser = TransactionParserFactory().make(account_config)
     reader = ReaderFactory().make(account_config)
 
     transactions = [
@@ -36,7 +36,7 @@ def file_to_ofx(account_config: AccountConfig, input_path: Path, output_path: Pa
     if len(transactions) == 0:
         return
 
-    ofx_client = OfxClient(account)
+    ofx_client = OfxClient(account_config)
 
     total_file = ofx_client.make_ofx_file(transactions)
 
@@ -47,7 +47,7 @@ def file_to_ofx(account_config: AccountConfig, input_path: Path, output_path: Pa
         ofxfile.close()
 
 
-def run(account: Account):
+def run_account_parsing(account: Account) -> None:
     account_config = init_settings(account)
     file_suffix = account_config.file_format.value
     input_files = [
@@ -58,8 +58,12 @@ def run(account: Account):
         file_to_ofx(account_config, file, output_file)
 
 
-if __name__ == "__main__":
+def run() -> None:
     parser = get_main_parser()
     args, _ = parser.parse_known_args()
     account = Account(args.account)
-    run(account)
+    run_account_parsing(account)
+
+
+if __name__ == "__main__":
+    run()

@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 
+
 def get_main_parser() -> ArgumentParser:
     parser = ArgumentParser(
             prog="ofx-converter",

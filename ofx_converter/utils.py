@@ -1,5 +1,5 @@
-from enum import Enum
 from datetime import datetime
+from enum import Enum
 
 
 def to_ofx_time(dt: datetime) -> str:
@@ -17,3 +17,4 @@ def to_ofx_time(dt: datetime) -> str:
 
 class FileType(Enum):
     CSV = "csv"
+    OFX = "ofx"

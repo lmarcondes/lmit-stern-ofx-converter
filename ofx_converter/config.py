@@ -1,6 +1,7 @@
-from dynaconf import Dynaconf
+from dynaconf import Dynaconf, LazySettings
 
-def get_settings():
+
+def get_settings() -> LazySettings:
     settings = Dynaconf(use_dotenv=True, environments=True)
     return settings["converter"]
 
