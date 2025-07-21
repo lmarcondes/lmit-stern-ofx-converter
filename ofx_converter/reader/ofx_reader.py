@@ -17,7 +17,7 @@ class OfxReader(BaseReader):
         self._encoding = encoding
 
     def _read_ofx(self, file_path: Path) -> Ofx:
-        with open(file_path, mode="r", encoding=self._encoding) as file_obj:
+        with open(file_path, mode="rb") as file_obj:
             ofx_file = OfxParser.parse(file_obj)
             file_obj.close()
         return ofx_file
