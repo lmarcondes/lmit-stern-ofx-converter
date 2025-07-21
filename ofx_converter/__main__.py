@@ -93,7 +93,7 @@ def run_account_parsing(
 def run() -> None:
     parser = get_main_parser()
     args, _ = parser.parse_known_args()
-    parse_date: Callable[[str], datetime] = lambda dt: datetime.strptime(dt, "%Y-%m")
+    parse_date: Callable[[str], datetime | None] = lambda dt: datetime.strptime(dt, "%Y-%m") if dt is not None else None
     account, from_date, to_date = (
         Account(args.account),
         parse_date(args.from_date),
