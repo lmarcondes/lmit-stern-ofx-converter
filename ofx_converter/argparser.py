@@ -12,4 +12,18 @@ def get_main_parser() -> ArgumentParser:
             type=str,
             required=True
             )
+    parser.add_argument(
+            "--from_date",
+            action="store",
+            type=str,
+            required=False,
+            default=None
+            )
+    parser.add_argument(
+            "--to_date",
+            action="store",
+            type=str,
+            required=False,
+            default=None
+            )
     return parser

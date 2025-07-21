@@ -1,4 +1,7 @@
+import re
+from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 from ofx_converter.argparser import get_main_parser
 from ofx_converter.logger import get_logger
@@ -22,7 +25,9 @@ def init_settings(account: Account) -> AccountConfig:
     return account_config
 
 
-def file_to_ofx(account_config: AccountConfig, input_path: Path, output_path: Path) -> None:
+def file_to_ofx(
+    account_config: AccountConfig, input_path: Path, output_path: Path
+) -> None:
     # Read the CSV file
     logger.info("Converting file to OFX for %s account", account_config.account)
     logger.info("Converting from %s to %s", input_path, output_path)
@@ -47,13 +52,40 @@ def file_to_ofx(account_config: AccountConfig, input_path: Path, output_path: Pa
         ofxfile.close()
 
 
-def run_account_parsing(account: Account) -> None:
+def filter_files_with_dates(
+    files: list[Path], from_date: datetime | None, to_date: datetime | None
+) -> list[Path]:
+    if from_date is None and to_date is None:
+        return files
+
+    def is_within_range(file: Path) -> bool:
+        date_match = re.search("(?P<year>\\d{4})-(?P<month>\\d{2})", file.name)
+        if date_match is None:
+            return False
+        year, month = date_match.group("year"), date_match.group("month")
+        date = datetime(year=int(year), month=int(month), day=1)
+        if from_date is None:
+            assert to_date is not None
+            return date <= to_date
+        elif to_date is None:
+            return from_date <= date
+        else:
+            return from_date <= date and date <= to_date
+
+    filtered_files = list(filter(is_within_range, files))
+    return filtered_files
+
+
+def run_account_parsing(
+    account: Account, from_date: datetime | None = None, to_date: datetime | None = None
+) -> None:
     account_config = init_settings(account)
     file_suffix = account_config.file_format.value
     input_files = [
         x for x in account_config.file_in.iterdir() if x.suffix.endswith(file_suffix)
     ]
-    for file in input_files:
+    filtered_files = filter_files_with_dates(input_files, from_date, to_date)
+    for file in filtered_files:
         output_file = account_config.file_out / f"{file.stem}.ofx"
         file_to_ofx(account_config, file, output_file)
 
@@ -61,8 +93,13 @@ def run_account_parsing(account: Account) -> None:
 def run() -> None:
     parser = get_main_parser()
     args, _ = parser.parse_known_args()
-    account = Account(args.account)
-    run_account_parsing(account)
+    parse_date: Callable[[str], datetime] = lambda dt: datetime.strptime(dt, "%Y-%m")
+    account, from_date, to_date = (
+        Account(args.account),
+        parse_date(args.from_date),
+        parse_date(args.to_date),
+    )
+    run_account_parsing(account, from_date, to_date)
 
 
 if __name__ == "__main__":
