@@ -47,6 +47,8 @@ class OfxClient(LogMixin):
         self.log.info("Making OFX header for account %s", self._account)
         dtstart = transactions[0].ofx_date
         dtend = transactions[-1].ofx_date
+        file_options = self._account_config.file_options
+        encoding, charset = file_options.get("encoding"), file_options.get("charset")
         payload = {
             "dtnow": self.ofx_now,
             "dtstart": dtstart,
@@ -59,11 +61,15 @@ class OfxClient(LogMixin):
             "accttype": self._account_config.accttype,
             "lang": self._account_config.lang,
             "cur": self._account_config.cur,
+            "accttype_abbreviation": self._account_config.account_type.abbreviation(),
+            "encoding": encoding,
+            "charset": charset,
+            "accttype_msgserver": self._account_config.account_type.msg_server(),
         }
         header = self.header_template.render(**payload)
         return header
 
-    def make_ofx_transaction(self, template: Template) -> Callable[[ Transaction ], str]:
+    def make_ofx_transaction(self, template: Template) -> Callable[[Transaction], str]:
         def inner(t: Transaction) -> str:
             payload = {
                 "trn_type": t.transaction_type,
@@ -93,14 +99,20 @@ class OfxClient(LogMixin):
         sorted_transactions = sorted(transactions)
         dtend = sorted_transactions[-1].ofx_date
         last_balance = sorted_transactions[-1].balance
-        footer = self.footer_template.render(last_balance=last_balance, dtend=dtend)
+        payload = {
+            "last_balance": last_balance,
+            "dt_end": dtend,
+            "accttype_abbreviation": self._account_config.account_type.abbreviation(),
+        }
+        footer = self.footer_template.render(**payload)
         return footer
 
     def make_ofx_file(self, transactions: list[Transaction]) -> str:
         self.log.info("Making OFX file for account %s", self._account)
         reducer = lambda x, y: x + "\n" + y
+        sorted_transactions = sorted(transactions)
         body = reduce(reducer, self.make_ofx_transactions(transactions))
-        header = self.make_ofx_header(transactions)
-        footer = self.make_ofx_footer(transactions)
+        header = self.make_ofx_header(sorted_transactions)
+        footer = self.make_ofx_footer(sorted_transactions)
         total_file = reduce(reducer, [header, body, footer])
         return total_file

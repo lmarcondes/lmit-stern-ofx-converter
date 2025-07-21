@@ -3,5 +3,5 @@
 <DTPOSTED>{{dt_posted}}</DTPOSTED>
 <TRNAMT>{{amount}}</TRNAMT>
 <FITID>{{fitid}}</FITID>
-<NAME>{{desc}}</NAME>
+<MEMO>{{desc}}</MEMO>
 </STMTTRN>
