@@ -58,7 +58,7 @@ class Transaction:
                     self._tran_type,
                     self.value,
                 )
-            return self._tran_type
+            return self._tran_type.upper()
         else:
             return "DEBIT" if self.value < 0 else "CREDIT"
 

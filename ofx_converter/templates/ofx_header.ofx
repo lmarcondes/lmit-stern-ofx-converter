@@ -2,8 +2,8 @@ OFXHEADER:100
 DATA:OFXSGML
 VERSION:102
 SECURITY:NONE
-ENCODING:UTF-8
-CHARSET:NONE
+ENCODING:{{encoding if encoding else "UTF-8"}}
+CHARSET:{{charset if charset else "NONE"}}
 COMPRESSION:NONE
 OLDFILEUID:NONE
 NEWFILEUID:NONE
@@ -23,16 +23,16 @@ NEWFILEUID:NONE
 </FI>
 </SONRS>
 </SIGNONMSGSRSV1>
-<BANKMSGSRSV1>
-<STMTTRNRS>
+<{{accttype_msgserver}}MSGSRSV1>
+<{{accttype_abbreviation}}STMTTRNRS>
 <TRNUID>1</TRNUID>
 <STATUS>
 <CODE>0</CODE>
 <SEVERITY>INFO</SEVERITY>
 </STATUS>
-<STMTRS>
+<{{accttype_abbreviation}}STMTRS>
 <CURDEF>{{cur}}</CURDEF>
-<BANKACCTFROM>
+<{{accttype_abbreviation}}ACCTFROM>
 <BANKID>{{bankid}}</BANKID>
 <BRANCHID>{{branchid}}</BRANCHID>
 <ACCTID>{{acctid}}</ACCTID>
