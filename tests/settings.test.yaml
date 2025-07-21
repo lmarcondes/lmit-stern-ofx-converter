@@ -52,8 +52,8 @@ default:
         files:
           format: ofx
           options:
-            delimiter: ;
-            encoding: utf-8-sig
+            encoding: us-ascii
+            charset: 1252
           in: ./tests/files/nubank/card
           out: /tmp/ofx_converter/nubank/card
         lang: por
