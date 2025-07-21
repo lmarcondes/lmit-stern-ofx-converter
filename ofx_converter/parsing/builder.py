@@ -9,6 +9,7 @@ from ofx_converter.parsing.xp_transaction_parser import (
     XPCardTransactionParser,
     XPTransactionParser,
 )
+from ofx_converter.utils import FileType
 
 
 class TransactionParserFactory(LogMixin):
@@ -22,6 +23,8 @@ class TransactionParserFactory(LogMixin):
         elif account == Account.XP_INVESTIMENTOS:
             return XPTransactionParser(account_config)
         elif account == Account.NUBANK_CARD:
+            return OfxTransactionParser(account_config)
+        elif account_config.file_format == FileType.OFX:
             return OfxTransactionParser(account_config)
         else:
             raise NotImplementedError("Parser for account %s not implemented", account)
