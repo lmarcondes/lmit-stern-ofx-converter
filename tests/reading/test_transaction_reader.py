@@ -11,7 +11,7 @@ class ReaderTestCase(BaseTestCase):
 
     def test_csv_read_transactions(self) -> None:
 
-        file = Path("./tests/files/xpi/card/test.csv")
+        file = Path("./tests/files/xpi/card/2025-03.csv")
         account_name = "xpi-cartao"
         account = Account(account_name)
         account_config = AccountConfig(account)
@@ -26,7 +26,7 @@ class ReaderTestCase(BaseTestCase):
             self.assertTrue(t.is_valid)
 
     def test_ofx_read_transactions(self) -> None:
-        file = Path("./tests/files/nubank/card/test.ofx")
+        file = Path("./tests/files/nubank/card/2025-04.ofx")
         account_name = "nubank-cartao"
         account = Account(account_name)
         account_config = AccountConfig(account)
