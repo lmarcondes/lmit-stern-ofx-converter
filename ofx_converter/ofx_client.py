@@ -110,6 +110,7 @@ class OfxClient(LogMixin):
             "last_balance": last_balance,
             "dt_end": dtend,
             "accttype_abbreviation": self._account_config.account_type.abbreviation(),
+            "accttype_msgserver": self._account_config.account_type.msg_server(),
         }
         footer = self.footer_template.render(**payload)
         return footer
