@@ -27,3 +27,11 @@ class AccountType(Enum):
             return "BANK"
         else:
             raise NotImplementedError()
+
+    def template_path(self) -> str:
+        if self == AccountType.CREDIT_CARD:
+            return "credit-card"
+        elif self == AccountType.CHECKING:
+            return "banking"
+        else:
+            raise NotImplementedError()
