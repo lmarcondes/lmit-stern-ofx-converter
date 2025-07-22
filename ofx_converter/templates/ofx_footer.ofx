@@ -3,7 +3,7 @@
 <BALAMT>{{ last_balance if last_balance }}</BALAMT>
 <DTASOF>{{ dtend if dtend }}</DTASOF>
 </LEDGERBAL>
-</{{accttype_abbreviation}}STMTRS>
-</{{accttype_abbreviation}}STMTTRNRS>
+</STMTRS>
+</STMTTRNRS>
 </{{accttype_abbreviation}}MSGSRSV1>
 </OFX>

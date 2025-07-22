@@ -24,13 +24,13 @@ NEWFILEUID:NONE
 </SONRS>
 </SIGNONMSGSRSV1>
 <{{accttype_msgserver}}MSGSRSV1>
-<{{accttype_abbreviation}}STMTTRNRS>
+<STMTTRNRS>
 <TRNUID>1</TRNUID>
 <STATUS>
 <CODE>0</CODE>
 <SEVERITY>INFO</SEVERITY>
 </STATUS>
-<{{accttype_abbreviation}}STMTRS>
+<STMTRS>
 <CURDEF>{{cur}}</CURDEF>
 <{{accttype_abbreviation}}ACCTFROM>
 <BANKID>{{bankid}}</BANKID>
