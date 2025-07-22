@@ -2,7 +2,7 @@ from datetime import datetime
 from functools import reduce
 from typing import Callable
 
-from jinja2 import Environment, PackageLoader, Template
+from jinja2 import BaseLoader, ChoiceLoader, Environment, PackageLoader, Template
 
 from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.account import Account
@@ -18,10 +18,17 @@ class OfxClient(LogMixin):
 
     def __init__(self, account_config: AccountConfig) -> None:
         super().__init__()
-        self.dtnow = datetime.now().astimezone()
-        self._template_reader = Environment(loader=PackageLoader("ofx_converter"))
         self._account_config = account_config
+        self.dtnow = datetime.now().astimezone()
+        self._template_reader = Environment(loader=self._make_template_loader())
         self.log.info("Creating ofx client for account %s", self._account)
+
+    def _make_template_loader(self) -> BaseLoader:
+        account_type_template_path = self._account_config.account_type.template_path()
+        template_paths = [f"templates/{account_type_template_path}", "templates"]
+        loaders = [PackageLoader("ofx_converter", path) for path in template_paths]
+        loader = ChoiceLoader(loaders)
+        return loader
 
     @property
     def _account(self) -> Account:
