@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Generator
 
 from ofx_converter.argparser import get_main_parser
 from ofx_converter.logger import get_logger
@@ -27,7 +27,7 @@ def init_settings(account: Account) -> AccountConfig:
 
 def file_to_ofx(
     account_config: AccountConfig, input_path: Path, output_path: Path
-) -> None:
+) -> Path | None:
     # Read the CSV file
     logger.info("Converting file to OFX for %s account", account_config.account)
     logger.info("Converting from %s to %s", input_path, output_path)
@@ -39,7 +39,7 @@ def file_to_ofx(
     ]
 
     if len(transactions) == 0:
-        return
+        return None
 
     ofx_client = OfxClient(account_config)
 
@@ -50,6 +50,7 @@ def file_to_ofx(
     with open(output_path, "w") as ofxfile:
         ofxfile.write(total_file)
         ofxfile.close()
+    return output_path
 
 
 def filter_files_with_dates(
@@ -78,7 +79,7 @@ def filter_files_with_dates(
 
 def run_account_parsing(
     account: Account, from_date: datetime | None = None, to_date: datetime | None = None
-) -> None:
+) -> Generator[Path | None, None, None]:
     account_config = init_settings(account)
     file_suffix = account_config.file_format.value
     input_files = [
@@ -87,19 +88,21 @@ def run_account_parsing(
     filtered_files = filter_files_with_dates(input_files, from_date, to_date)
     for file in filtered_files:
         output_file = account_config.file_out / f"{file.stem}.ofx"
-        file_to_ofx(account_config, file, output_file)
+        yield file_to_ofx(account_config, file, output_file)
 
 
 def run() -> None:
     parser = get_main_parser()
     args, _ = parser.parse_known_args()
-    parse_date: Callable[[str], datetime | None] = lambda dt: datetime.strptime(dt, "%Y-%m") if dt is not None else None
+    parse_date: Callable[[str], datetime | None] = lambda dt: (
+        datetime.strptime(dt, "%Y-%m") if dt is not None else None
+    )
     account, from_date, to_date = (
         Account(args.account),
         parse_date(args.from_date),
         parse_date(args.to_date),
     )
-    run_account_parsing(account, from_date, to_date)
+    list(run_account_parsing(account, from_date, to_date))
 
 
 if __name__ == "__main__":
