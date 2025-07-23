@@ -67,6 +67,9 @@ class OfxClient(LogMixin):
         dtend = transactions[-1].ofx_date
         file_options = self._account_config.file_options
         encoding, charset = file_options.get("encoding"), file_options.get("charset")
+        maybe_as_upper: Callable[[str | None], str | None] = lambda v: (
+            str(v).upper() if v is not None else None
+        )
         payload = {
             "dtnow": self.ofx_now,
             "dtstart": dtstart,
@@ -80,8 +83,8 @@ class OfxClient(LogMixin):
             "lang": self._account_config.lang,
             "cur": self._account_config.cur,
             "accttype_abbreviation": self._account_config.account_type.abbreviation(),
-            "encoding": encoding,
-            "charset": charset,
+            "encoding": maybe_as_upper(encoding),
+            "charset": maybe_as_upper(charset),
             "accttype_msgserver": self._account_config.account_type.msg_server(),
         }
         header = self.header_template.render(**payload)
