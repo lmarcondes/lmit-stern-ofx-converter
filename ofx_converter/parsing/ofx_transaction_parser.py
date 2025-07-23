@@ -14,14 +14,19 @@ class OfxTransactionParser(TransactionParser[OfxTransaction]):
     def __init__(self, account: AccountConfig) -> None:
         super().__init__(account)
 
-    def installment_id(self, tran_id: str, memo: str) -> str | None:
+    def _is_installment(self, memo: str) -> bool:
         match = re.search("Parcela (\\d+)/(\\d+)", memo)
         if not match:
-            return tran_id
+            return False
         current_installment = match.group(1)
         if int(current_installment) <= 1:
-            return tran_id
-        return None
+            return False
+        return True
+
+    def installment_id(self, tran_id: str, memo: str) -> str | None:
+        if self._is_installment(memo):
+            return None
+        return tran_id
 
     def parse(self, record: OfxTransaction) -> Transaction | None:
         date: datetime
