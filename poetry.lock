@@ -639,7 +639,7 @@ dev = []
 
 [package.source]
 type = "git"
-url = "ssh://lmarcondesgit/lmarcondes/ofxparse"
+url = "https://github.com/lmarcondes/ofxparse"
 reference = "feature/reimplement"
 resolved_reference = "3d3367a2be7794c622a2f6de62a50b14add8cc8e"
 
@@ -927,4 +927,4 @@ dev = ["debugpy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "778c5c3fe66e08bc18151ccf181f057136f33723a7b4ae1e7ff3dc1354f28167"
+content-hash = "ef495f1fe03ae6fe114d9432c427f26cecb565c077d3346ecdfffbdd1185cf73"
