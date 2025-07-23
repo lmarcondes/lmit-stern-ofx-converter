@@ -5,7 +5,7 @@
 <DTASOF>{{ dtend if dtend }}</DTASOF>
 </LEDGERBAL>
 {% endif %}
-</{{accttype_abbreviation}}STMTRS>
-</{{accttype_abbreviation}}STMTTRNRS>
+</STMTRS>
+</STMTTRNRS>
 </{{accttype_msgserver}}MSGSRSV1>
 </OFX>
