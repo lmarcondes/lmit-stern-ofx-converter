@@ -26,7 +26,18 @@ class OfxClient(LogMixin):
     def _make_template_loader(self) -> BaseLoader:
         account_type_template_path = self._account_config.account_type.template_path()
         template_paths = [f"templates/{account_type_template_path}", "templates"]
-        loaders = [PackageLoader("ofx_converter", path) for path in template_paths]
+        loaders = []
+        base_package = "ofx_converter"
+        for path in template_paths:
+            try:
+                loader = PackageLoader(base_package, path)
+                loaders.append(loader)
+            except ValueError:
+                self.log.warning(
+                    "PackageLoader instantiation failed for path %s in package %s",
+                    path,
+                    base_package,
+                )
         loader = ChoiceLoader(loaders)
         return loader
 
