@@ -1,21 +1,33 @@
 [project]
 name = "ofx-converter"
-version = "0.1.0"
+dynamic = ["version"]
 description = ""
 authors = [
   { name = "Lucas Marcondes", email = "lucasnascimento95@gmail.com" },
 ]
 readme = "README.md"
+requires-python = ">=3.11"
 dependencies = [
-  "python>=3.12",
   "jinja2>=3.1.4",
   "dynaconf>=3.2.6",
   "pytest>=8.3.5",
   "pre-commit>=4.2.0",
   "python-dateutil>=2.0",
-  # "ofxparse @ https://github.com/lmarcondes/ofxparse.git#feature/reimplement",
+  "ofxparse @ git+https://github.com/lmarcondes/ofxparse@feature/reimplement",
 ]
-requires-python = ">3.10"
 
-# [project.optional-dependencies]
-# test = ["debugpy>=1.8.6"]
+[project.optional-dependencies]
+test = ["debugpy>=1.8.6"]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.0"
