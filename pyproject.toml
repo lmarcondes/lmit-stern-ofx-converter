@@ -20,6 +20,9 @@ dependencies = [
 [project.optional-dependencies]
 test = ["debugpy>=1.8.6"]
 
+[project.scripts]
+ofxc = "ofx_converter:run"
+
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"

@@ -3,6 +3,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Generator
 
+from click import argument, command, option
+from dateutil.relativedelta import relativedelta
+
 from ofx_converter.argparser import get_main_parser
 from ofx_converter.logger import get_logger
 from ofx_converter.ofx_client import OfxClient
@@ -91,19 +94,20 @@ def run_account_parsing(
         yield file_to_ofx(account_config, file, output_file)
 
 
-def run() -> None:
-    parser = get_main_parser()
-    args, _ = parser.parse_known_args()
+@command("convert")
+@argument("account_name", type=str, required=True)
+@option("from_date", type=str, required=False)
+@option("to_date", type=str, required=False)
+def run(account_name: str, from_date: str | None = None, to_date: str | None = None) -> None:
+    current_date = datetime.today()
+
     parse_date: Callable[[str], datetime | None] = lambda dt: (
         datetime.strptime(dt, "%Y-%m") if dt is not None else None
     )
-    account, from_date, to_date = (
-        Account(args.account),
-        parse_date(args.from_date),
-        parse_date(args.to_date),
+    account, parsed_from_date, parsed_to_date = (
+        Account(account_name),
+        parse_date(from_date) if from_date else (current_date - relativedelta(months=5)),
+        parse_date(to_date) if to_date else current_date,
     )
-    list(run_account_parsing(account, from_date, to_date))
-
-
-if __name__ == "__main__":
-    run()
+    run_account_parsing(account, parsed_from_date, parsed_to_date)
+    pass
