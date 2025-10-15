@@ -1,32 +1,21 @@
-[tool.poetry]
+[project]
 name = "ofx-converter"
 version = "0.1.0"
 description = ""
-authors = ["Lucas Marcondes <lucasnascimento95@gmail.com>"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.12"
-jinja2 = "^3.1.4"
-debugpy = {version = "^1.8.6", optional = true}
-dynaconf = "^3.2.6"
-pytest = "^8.3.5"
-pre-commit = "^4.2.0"
-python-dateutil = "^2.0"
-ofxparse = {git = "https://github.com/lmarcondes/ofxparse", rev = "feature/reimplement"}
-
-[tool.poetry.extras]
-dev = [
-  "debugpy",
-  "ipython",
+authors = [
+  { name = "Lucas Marcondes", email = "lucasnascimento95@gmail.com" },
 ]
+readme = "README.md"
+dependencies = [
+  "python>=3.12",
+  "jinja2>=3.1.4",
+  "dynaconf>=3.2.6",
+  "pytest>=8.3.5",
+  "pre-commit>=4.2.0",
+  "python-dateutil>=2.0",
+  # "ofxparse @ https://github.com/lmarcondes/ofxparse.git#feature/reimplement",
+]
+requires-python = ">3.10"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-style = "pep440"
-bump = true
-
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
+# [project.optional-dependencies]
+# test = ["debugpy>=1.8.6"]
