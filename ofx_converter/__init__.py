@@ -96,9 +96,16 @@ def run_account_parsing(
 
 @command("convert")
 @argument("account_name", type=str, required=True)
-@option("from_date", type=str, required=False)
-@option("to_date", type=str, required=False)
+@option("--from_date", type=str, required=False)
+@option("--to_date", type=str, required=False)
 def run(account_name: str, from_date: str | None = None, to_date: str | None = None) -> None:
+    """Converts files for a given account name
+
+    Args:
+        account_name: name of the account
+        from_date: month to convert files from
+        to_date: month to convert files until
+    """
     current_date = datetime.today()
 
     parse_date: Callable[[str], datetime | None] = lambda dt: (
