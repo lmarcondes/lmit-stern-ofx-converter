@@ -3,7 +3,5 @@
 *.log
 __pycache__
 *.db
-.python-version
-pyrightconfig.json
 dist
 build

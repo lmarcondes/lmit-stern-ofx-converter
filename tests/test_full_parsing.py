@@ -3,7 +3,7 @@ from typing import Callable
 
 from ofxparse import OfxParser
 
-from ofx_converter.__main__ import filter_files_with_dates, run_account_parsing
+from ofx_converter import filter_files_with_dates, run_account_parsing
 from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from tests.base_test_case import BaseTestCase

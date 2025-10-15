@@ -6,7 +6,7 @@ authors = [
   { name = "Lucas Marcondes", email = "lucasnascimento95@gmail.com" },
 ]
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
   "jinja2>=3.1.4",
   "dynaconf>=3.2.6",
@@ -14,10 +14,14 @@ dependencies = [
   "pre-commit>=4.2.0",
   "python-dateutil>=2.0",
   "ofxparse @ git+https://github.com/lmarcondes/ofxparse@feature/reimplement",
+  "click>=8.3.0",
 ]
 
 [project.optional-dependencies]
 test = ["debugpy>=1.8.6"]
+
+[project.scripts]
+ofxc = "ofx_converter:run"
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
