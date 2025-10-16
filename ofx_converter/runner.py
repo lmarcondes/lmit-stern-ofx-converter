@@ -18,12 +18,12 @@ class Runner(LogMixin):
     def __init__(self, account_name: str) -> None:
         super().__init__()
         account: Account = Account(account_name)
+        self.account = account
+        self.account_config = self.init_settings()
         self.log.info(
             "Instantiating runner with account %s",
             account_name,
         )
-        self.account = account
-        self.account_config = self.init_settings()
 
     def init_settings(self) -> AccountConfig:
         account_config = AccountConfig(self.account)
@@ -87,6 +87,7 @@ class Runner(LogMixin):
     def run_account_parsing(
         self, from_date: datetime | None = None, to_date: datetime | None = None
     ) -> Generator[Path | None, None, None]:
+        self.log.info("Starting account parsing")
         account_config = self.init_settings()
         file_suffix = account_config.file_format.value
         input_files = [
@@ -94,7 +95,15 @@ class Runner(LogMixin):
             for x in account_config.file_in.iterdir()
             if x.suffix.endswith(file_suffix)
         ]
+        if len(input_files) == 0:
+            self.log.error("Found no files to convert")
+            return
+        self.log.info("Found %s files to convert", len(input_files))
         filtered_files = self.filter_files_with_dates(input_files, from_date, to_date)
+        if len(filtered_files) == 0:
+            self.log.error("No files found for conversion")
+            return
+        self.log.info("Filtered %s files to convert", len(filtered_files))
         for file in filtered_files:
             output_file = account_config.file_out / f"{file.stem}.ofx"
             yield self.file_to_ofx(file, output_file)

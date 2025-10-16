@@ -44,4 +44,4 @@ def convert(
         parsed_to_date.isoformat(),
     )
     runner = Runner(account_name)
-    runner.run_account_parsing(parsed_from_date, parsed_to_date)
+    results = list(runner.run_account_parsing(parsed_from_date, parsed_to_date))
