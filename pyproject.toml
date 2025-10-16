@@ -21,7 +21,7 @@ dependencies = [
 test = ["debugpy>=1.8.6"]
 
 [project.scripts]
-ofxc = "ofx_converter:run"
+ofxc = "ofx_converter:main"
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]

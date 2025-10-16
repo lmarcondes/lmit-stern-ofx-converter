@@ -1,13 +1,16 @@
 import sys
 from abc import ABC
-from logging import INFO, Logger, StreamHandler
+from logging import INFO, Formatter, Logger, StreamHandler
 
 from ofx_converter.config import get_settings
 
 
 def get_logger(name: str, level: int = INFO) -> Logger:
     logger = Logger(name, level)
-    logger.addHandler(StreamHandler(sys.stdout))
+    formatter = Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
+    handler = StreamHandler()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
     return logger
 
 
