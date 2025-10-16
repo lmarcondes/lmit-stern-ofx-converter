@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Generator
 
-from click import argument, command, option
+from click import argument, command, group, option
 from dateutil.relativedelta import relativedelta
 
 from ofx_converter.argparser import get_main_parser
@@ -94,11 +94,18 @@ def run_account_parsing(
         yield file_to_ofx(account_config, file, output_file)
 
 
-@command("convert")
+@group("main")
+def main() -> None:
+    pass
+
+
+@main.command("convert")
 @argument("account_name", type=str, required=True)
 @option("--from_date", type=str, required=False)
 @option("--to_date", type=str, required=False)
-def run(account_name: str, from_date: str | None = None, to_date: str | None = None) -> None:
+def convert(
+    account_name: str, from_date: str | None = None, to_date: str | None = None
+) -> None:
     """Converts files for a given account name
 
     Args:
@@ -108,13 +115,16 @@ def run(account_name: str, from_date: str | None = None, to_date: str | None = N
     """
     current_date = datetime.today()
 
-    parse_date: Callable[[str], datetime | None] = lambda dt: (
-        datetime.strptime(dt, "%Y-%m") if dt is not None else None
+    parse_date: Callable[[str], datetime] = lambda dt: (datetime.strptime(dt, "%Y-%m"))
+    account: Account = Account(account_name)
+    parsed_from_date: datetime = (
+        parse_date(from_date) if from_date else (current_date - relativedelta(months=5))
     )
-    account, parsed_from_date, parsed_to_date = (
-        Account(account_name),
-        parse_date(from_date) if from_date else (current_date - relativedelta(months=5)),
-        parse_date(to_date) if to_date else current_date,
+    parsed_to_date: datetime = parse_date(to_date) if to_date else current_date
+    logger.info(
+        "Converting account %s from date %s to date %s",
+        account_name,
+        parsed_from_date.isoformat(),
+        parsed_to_date.isoformat(),
     )
     run_account_parsing(account, parsed_from_date, parsed_to_date)
-    pass
