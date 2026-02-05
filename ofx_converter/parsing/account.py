@@ -7,3 +7,4 @@ class Account(Enum):
     XP_INVESTIMENTOS = "xpi-investimentos"
     NUBANK_CARD = "nubank-cartao"
     NUBANK_CONTA = "nubank-conta"
+    ITAU_CONTA = "itau-conta"
