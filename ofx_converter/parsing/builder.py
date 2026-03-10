@@ -16,7 +16,6 @@ from ofx_converter.utils import FileType
 class TransactionParserFactory(LogMixin):
 
     _parser_map: dict[Account, Type[TransactionParser[Any]]] = {
-        Account.XP_CONTA: XPTransactionParser,
         Account.XP_CARTAO: XPCardTransactionParser,
         Account.XP_INVESTIMENTOS: XPTransactionParser,
         Account.NUBANK_CARD: NubankTransactionParser,
