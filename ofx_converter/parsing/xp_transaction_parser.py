@@ -12,11 +12,12 @@ from ofx_converter.parsing.transaction_parser import TransactionParser
 
 class XPTransactionParser(TransactionParser[dict[str, Any]]):
     DATE_COL = "Data"
+    HOUR_COL = "Hora"
     DESCRIPTION_COL = "Descricao"
     VALUE_COL = "Valor"
     BALANCE_COL = "Saldo"
     INSTALLMENT_COL = "Parcela"
-    _date_pattern = "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{2})[\\s\\w]+(?P<hour>\\d{2}):(?P<min>\\d{2}):(?P<sec>\\d{2})$"
+    _date_pattern = "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{2})\\s(?P<hour>\\d{2}):(?P<min>\\d{2}):(?P<sec>\\d{2})$"
     _value_pattern = "(?P<sign>-)?R\\$ (?P<value>[\\d\\.,]+)$"
 
     def __init__(self, account: AccountConfig) -> None:
@@ -43,14 +44,16 @@ class XPTransactionParser(TransactionParser[dict[str, Any]]):
         return int(current_installment), int(last_installment)
 
     def parse(self, record: dict[str, Any]) -> Transaction | None:
-        (date, desc, value, balance, installment) = (
+        (date, hour, desc, value, balance, installment) = (
             record.get(self.DATE_COL),
+            record.get(self.HOUR_COL),
             record.get(self.DESCRIPTION_COL),
             record.get(self.VALUE_COL),
             record.get(self.BALANCE_COL),
             record.get(self.INSTALLMENT_COL),
         )
-        date_parsed = self._date_parser.parse(date)
+        date_hour = f"{date} {hour}" if hour is not None else f"{date} 00:00:00"
+        date_parsed = self._date_parser.parse(date_hour)
         value_converted = self._money_parser.parse(value)
         balance_converted = self._money_parser.parse(balance)
         installment_tuple = self._parse_installment(installment)
