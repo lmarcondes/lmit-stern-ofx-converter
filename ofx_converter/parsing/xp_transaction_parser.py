@@ -70,5 +70,5 @@ class XPTransactionParser(TransactionParser[dict[str, Any]]):
 
 class XPCardTransactionParser(XPTransactionParser):
     DESCRIPTION_COL = "Estabelecimento"
-    _date_pattern = "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{4})$"
+    _date_pattern = "^(?P<day>\\d{2})/(?P<month>\\d{2})/(?P<year>\\d{4})"
     _value_pattern = "R\\$ (?P<sign>-)?(?P<value>[\\d\\.,]+)$"
