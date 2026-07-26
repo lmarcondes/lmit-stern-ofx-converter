@@ -15,13 +15,17 @@ class OfxTransactionParser(TransactionParser[OfxTransaction]):
         super().__init__(account)
 
     def _is_installment(self, memo: str) -> bool:
-        match = re.search("Parcela (\\d+)/(\\d+)", memo)
-        if not match:
-            return False
-        current_installment = match.group(1)
-        if int(current_installment) <= 1:
-            return False
-        return True
+        patterns = [
+            r"Parcela (\d+)/(\d+)",
+            r"[ \-](\d+)/(\d+)$",
+        ]
+        for pattern in patterns:
+            match = re.search(pattern, memo)
+            if match:
+                current_installment = match.group(1)
+                if int(current_installment) > 1:
+                    return True
+        return False
 
     def installment_id(self, tran_id: str, memo: str) -> str | None:
         if self._is_installment(memo):
