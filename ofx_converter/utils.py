@@ -18,3 +18,4 @@ def to_ofx_time(dt: datetime) -> str:
 class FileType(Enum):
     CSV = "csv"
     OFX = "ofx"
+    XLSX = "xlsx"

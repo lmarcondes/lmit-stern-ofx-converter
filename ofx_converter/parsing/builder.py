@@ -2,6 +2,7 @@ from typing import Any, Type
 
 from ofx_converter.logger import LogMixin
 from ofx_converter.parsing.account_config import AccountConfig
+from ofx_converter.parsing.itau_card_xlsx_parser import ItauCardXlsxParser
 from ofx_converter.parsing.nubank_transaction_parser import NubankTransactionParser
 from ofx_converter.parsing.ofx_transaction_parser import OfxTransactionParser
 from ofx_converter.parsing.parser_type import ParserType
@@ -19,6 +20,7 @@ class TransactionParserFactory(LogMixin):
         ParserType.XP_CSV: XPTransactionParser,
         ParserType.XP_CARD_CSV: XPCardTransactionParser,
         ParserType.NUBANK_OFX: NubankTransactionParser,
+        ParserType.ITAU_CARD_XLSX: ItauCardXlsxParser,
     }
 
     def make(self, account_config: AccountConfig) -> TransactionParser[Any]:
