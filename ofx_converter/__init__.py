@@ -6,7 +6,6 @@ from click import argument, group, option
 from dateutil.relativedelta import relativedelta
 
 from ofx_converter.logger import get_logger
-from ofx_converter.parsing.account import Account
 from ofx_converter.runner import Runner
 
 logger = get_logger("main")

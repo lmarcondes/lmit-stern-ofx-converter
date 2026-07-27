@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.builder import TransactionParserFactory
 from ofx_converter.reader_factory import ReaderFactory
@@ -13,8 +12,7 @@ class ReaderTestCase(BaseTestCase):
 
         file = Path("./tests/files/xpi/card/2025-03.csv")
         account_name = "xpi-cartao"
-        account = Account(account_name)
-        account_config = AccountConfig(account)
+        account_config = AccountConfig(account_name)
         reader = ReaderFactory().make(account_config)
         parser = TransactionParserFactory().make(account_config)
 
@@ -28,8 +26,7 @@ class ReaderTestCase(BaseTestCase):
     def test_ofx_read_transactions(self) -> None:
         file = Path("./tests/files/nubank/card/2025-04.ofx")
         account_name = "nubank-cartao"
-        account = Account(account_name)
-        account_config = AccountConfig(account)
+        account_config = AccountConfig(account_name)
         reader = ReaderFactory().make(account_config)
         parser = TransactionParserFactory().make(account_config)
 

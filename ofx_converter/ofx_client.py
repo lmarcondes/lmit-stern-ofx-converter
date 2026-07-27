@@ -5,7 +5,6 @@ from typing import Callable
 from jinja2 import BaseLoader, ChoiceLoader, Environment, PackageLoader, Template
 
 from ofx_converter.logger import LogMixin
-from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.utils import to_ofx_time
@@ -42,7 +41,7 @@ class OfxClient(LogMixin):
         return loader
 
     @property
-    def _account(self) -> Account:
+    def _account(self) -> str:
         return self._account_config.account
 
     @property

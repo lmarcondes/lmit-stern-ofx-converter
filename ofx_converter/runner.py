@@ -1,13 +1,10 @@
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, Generator
-
-from dateutil.relativedelta import relativedelta
+from typing import Generator
 
 from ofx_converter.logger import LogMixin
 from ofx_converter.ofx_client import OfxClient
-from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.builder import TransactionParserFactory
 from ofx_converter.reader_factory import ReaderFactory
@@ -17,8 +14,7 @@ class Runner(LogMixin):
 
     def __init__(self, account_name: str) -> None:
         super().__init__()
-        account: Account = Account(account_name)
-        self.account = account
+        self.account_name = account_name
         self.account_config = self.init_settings()
         self.log.info(
             "Instantiating runner with account %s",
@@ -26,7 +22,7 @@ class Runner(LogMixin):
         )
 
     def init_settings(self) -> AccountConfig:
-        account_config = AccountConfig(self.account)
+        account_config = AccountConfig(self.account_name)
         input_path = Path(account_config.file_in)
         if not input_path.exists():
             raise ValueError(f"Input dir is invalid: {input_path}")

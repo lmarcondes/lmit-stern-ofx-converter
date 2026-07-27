@@ -3,7 +3,6 @@ from typing import Callable
 
 from ofxparse import OfxParser
 
-from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.runner import Runner
 from tests.base_test_case import BaseTestCase

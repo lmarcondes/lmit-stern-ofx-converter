@@ -2,26 +2,39 @@ from pathlib import Path
 from typing import Any
 
 from ofx_converter.config import get_settings
-from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_type import AccountType
+from ofx_converter.parsing.parser_type import ParserType
 from ofx_converter.utils import FileType
 
 
 class AccountConfig:
-    def __init__(self, account: Account) -> None:
-        self._account = account
+    def __init__(self, account_name: str) -> None:
+        self._account_name = account_name
         self._settings = get_settings()
-        self._account_settings = self._settings["accounts"][account.value]
+        accounts = self._settings.accounts
+        if account_name not in accounts:
+            raise ValueError(f"Account '{account_name}' not found in settings")
+        self._account_settings = accounts[account_name]
 
     @property
-    def account(self) -> Account:
-        return self._account
+    def account(self) -> str:
+        return self._account_name
 
     @property
     def account_type(self) -> AccountType:
         account_type_str = self._account_settings.account.type
-        account_type = AccountType(account_type_str)
-        return account_type
+        return AccountType(account_type_str)
+
+    @property
+    def parser(self) -> ParserType:
+        parser_value = self._account_settings.get("parser")
+        if parser_value is not None:
+            return ParserType(parser_value)
+        if self.file_format == FileType.OFX:
+            return ParserType.OFX
+        raise ValueError(
+            f"Account '{self._account_name}' must specify a parser"
+        )
 
     @property
     def file_format(self) -> FileType:
