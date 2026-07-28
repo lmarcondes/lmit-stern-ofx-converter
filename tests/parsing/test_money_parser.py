@@ -1,7 +1,6 @@
 import re
 from decimal import Decimal
 
-from ofx_converter.parsing.account import Account
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.money_parser import MoneyParser
 from tests.base_test_case import BaseTestCase
@@ -15,8 +14,8 @@ class MoneyParsingTestSuite(BaseTestCase):
         return decimal_rounded
 
     def test_xp_credit_card_account(self) -> None:
-        account = Account("xpi-cartao")
-        config = AccountConfig(account)
+        account_name = "xpi-cartao"
+        config = AccountConfig(account_name)
         regex = re.compile("R\\$ (?P<sign>-)?(?P<value>[\\d\\.,]+)$")
         parser = MoneyParser(config, value_regex=regex)
         test_cases = [
@@ -31,8 +30,8 @@ class MoneyParsingTestSuite(BaseTestCase):
             self.assertEqual(result_rounded, expected_rounded)
 
     def test_xp_checking_account(self) -> None:
-        account = Account("xpi-conta")
-        config = AccountConfig(account)
+        account_name = "xpi-conta"
+        config = AccountConfig(account_name)
         regex = re.compile("(?P<sign>-)?R\\$ (?P<value>[\\d\\.,]+)$")
         parser = MoneyParser(config, value_regex=regex)
         test_cases = [

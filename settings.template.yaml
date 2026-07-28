@@ -20,6 +20,7 @@ default:
           branch: 0001
           id: 2187146
           type: checking
+        parser: xp-csv
       xpi-conta:
         files:
           format: csv
@@ -34,3 +35,4 @@ default:
           branch: 0001
           id: 2187146
           type: checking
+        parser: xp-csv

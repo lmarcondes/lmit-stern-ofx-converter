@@ -17,6 +17,7 @@ default:
           branch: 0001
           id: 2187146
           type: checking
+        parser: xp-csv
       xpi-conta:
         files:
           format: csv
@@ -31,6 +32,7 @@ default:
           branch: 0001
           id: 2187146
           type: checking
+        parser: xp-csv
       xpi-cartao:
         files:
           format: csv
@@ -48,6 +50,7 @@ default:
           branch: 0001
           id: 635fc5d6-8a5b-48f3-93ce-a2a0fd6cbfae
           type: credit-card
+        parser: xp-card-csv
       nubank-cartao:
         files:
           format: ofx
@@ -64,3 +67,37 @@ default:
         account:
           id: 61d7badc-f92a-469a-88b2-41a556f2fb29
           type: credit-card
+        parser: nubank-ofx
+      nubank-conta:
+        files:
+          format: ofx
+          options:
+            encoding: us-ascii
+            charset: 1252
+          in: ./tests/files/nubank/card
+          out: /tmp/ofx_converter/nubank/conta
+        lang: por
+        cur: brl
+        fi:
+          id: 260
+          org: NU PAGAMENTOS S.A.
+        account:
+          id: 61d7badc-f92a-469a-88b2-41a556f2fb29
+          type: checking
+        parser: ofx
+      itau-cartao:
+        files:
+          format: xlsx
+          options:
+            encoding: utf-8-sig
+          in: ./tests/files/itau/card
+          out: /tmp/ofx_converter/itau/card
+        lang: por
+        cur: brl
+        fi:
+          id: 341
+          org: BANCO ITAU SA
+        account:
+          id: 4423
+          type: credit-card
+        parser: itau-card-xlsx

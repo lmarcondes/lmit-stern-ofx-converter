@@ -3,6 +3,7 @@ from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.reader.abstract_reader import AbstractReader
 from ofx_converter.reader.csv_reader import CSVReader
 from ofx_converter.reader.ofx_reader import OfxReader
+from ofx_converter.reader.xlsx_reader import XlsxReader
 from ofx_converter.utils import FileType
 
 
@@ -17,6 +18,9 @@ class ReaderFactory(LogMixin):
         elif file_type == FileType.OFX:
             options = account_config.file_options
             reader = OfxReader(**options)
+        elif file_type == FileType.XLSX:
+            options = account_config.file_options
+            reader = XlsxReader(**options)
         else:
             raise NotImplementedError()
         return reader
