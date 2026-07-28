@@ -7,7 +7,6 @@ from ofx_converter.parsing.itau_card_xlsx_parser import ItauCardXlsxParser
 from ofx_converter.parsing.transaction import Transaction
 from tests.base_test_case import BaseTestCase
 
-
 _BRT = ZoneInfo("America/Sao_Paulo")
 
 
