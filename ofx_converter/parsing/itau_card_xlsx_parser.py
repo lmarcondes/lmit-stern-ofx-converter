@@ -4,6 +4,8 @@ from re import compile
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from dateutil.relativedelta import relativedelta
+
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.transaction import Transaction
 from ofx_converter.parsing.transaction_parser import TransactionParser
@@ -50,7 +52,10 @@ class ItauCardXlsxParser(TransactionParser[dict[str, Any]]):
         description_text = str(description)
         installment_tuple = self._parse_installment(installment)
         if installment_tuple is not None:
+            current_installment, _ = installment_tuple
             description_text = f"{description_text} - {installment}"
+            if current_installment > 1:
+                date_parsed += relativedelta(months=current_installment - 1)
 
         transaction = Transaction(
             date_parsed,
