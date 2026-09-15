@@ -1,5 +1,8 @@
 import re
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum, auto
 from pathlib import Path
 from typing import Generator
 
@@ -8,6 +11,50 @@ from ofx_converter.ofx_client import OfxClient
 from ofx_converter.parsing.account_config import AccountConfig
 from ofx_converter.parsing.builder import TransactionParserFactory
 from ofx_converter.reader_factory import ReaderFactory
+
+
+class ConversionStatus(Enum):
+    CONVERTED = auto()
+    SKIPPED = auto()
+    FAILED = auto()
+
+
+@dataclass
+class ConversionResult:
+    input_path: Path
+    output_path: Path
+    status: ConversionStatus
+    error: str | None = None
+
+
+def _convert_file(
+    account_name: str, input_path: Path, output_path: Path
+) -> ConversionResult:
+    try:
+        account_config = AccountConfig(account_name)
+        parser = TransactionParserFactory().make(account_config)
+        reader = ReaderFactory().make(account_config)
+
+        transactions = [
+            x for x in reader.read_transactions(parser, input_path) if x is not None
+        ]
+
+        if len(transactions) == 0:
+            return ConversionResult(input_path, output_path, ConversionStatus.SKIPPED)
+
+        ofx_client = OfxClient(account_config)
+        total_file = ofx_client.make_ofx_file(transactions)
+
+        with open(output_path, "w") as ofxfile:
+            ofxfile.write(total_file)
+        return ConversionResult(input_path, output_path, ConversionStatus.CONVERTED)
+    except Exception as exc:
+        return ConversionResult(
+            input_path,
+            output_path,
+            ConversionStatus.FAILED,
+            error=f"{type(exc).__name__}: {exc}",
+        )
 
 
 class Runner(LogMixin):
@@ -30,32 +77,6 @@ class Runner(LogMixin):
         if not output_path.exists():
             output_path.mkdir(parents=True)
         return account_config
-
-    def file_to_ofx(self, input_path: Path, output_path: Path) -> Path | None:
-        # Read the CSV file
-        account_config = self.account_config
-        self.log.info("Converting file to OFX for %s account", account_config.account)
-        self.log.info("Converting from %s to %s", input_path, output_path)
-        parser = TransactionParserFactory().make(account_config)
-        reader = ReaderFactory().make(account_config)
-
-        transactions = [
-            x for x in reader.read_transactions(parser, input_path) if x is not None
-        ]
-
-        if len(transactions) == 0:
-            return None
-
-        ofx_client = OfxClient(account_config)
-
-        total_file = ofx_client.make_ofx_file(transactions)
-
-        # Write the OFX file
-        self.log.info("Writing OFX file with %i transactions", len(transactions))
-        with open(output_path, "w") as ofxfile:
-            ofxfile.write(total_file)
-            ofxfile.close()
-        return output_path
 
     def filter_files_with_dates(
         self, files: list[Path], from_date: datetime | None, to_date: datetime | None
@@ -82,7 +103,7 @@ class Runner(LogMixin):
 
     def run_account_parsing(
         self, from_date: datetime | None = None, to_date: datetime | None = None
-    ) -> Generator[Path | None, None, None]:
+    ) -> Generator[ConversionResult, None, None]:
         self.log.info("Starting account parsing")
         account_config = self.init_settings()
         file_suffix = account_config.file_format.value
@@ -100,6 +121,15 @@ class Runner(LogMixin):
             self.log.error("No files found for conversion")
             return
         self.log.info("Filtered %s files to convert", len(filtered_files))
-        for file in filtered_files:
-            output_file = account_config.file_out / f"{file.stem}.ofx"
-            yield self.file_to_ofx(file, output_file)
+        with ProcessPoolExecutor() as executor:
+            futures = {
+                executor.submit(
+                    _convert_file,
+                    self.account_name,
+                    file,
+                    account_config.file_out / f"{file.stem}.ofx",
+                ): file
+                for file in filtered_files
+            }
+            for future in as_completed(futures):
+                yield future.result()

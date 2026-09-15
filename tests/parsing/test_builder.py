@@ -31,6 +31,9 @@ class ParserFactoryTestCase(BaseTestCase):
 
     def test_csv_without_specialized_parser_raises(self) -> None:
         config = AccountConfig("xpi-cartao")
+        # get_settings() is process-cached, so mutate a local copy rather
+        # than the shared settings tree (would corrupt other tests/accounts).
+        config._account_settings = dict(config._account_settings)
         config._account_settings["parser"] = "ofx"
         with self.assertRaises(NotImplementedError):
             TransactionParserFactory().make(config)

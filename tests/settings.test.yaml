@@ -68,6 +68,23 @@ default:
           id: 61d7badc-f92a-469a-88b2-41a556f2fb29
           type: credit-card
         parser: nubank-ofx
+      nubank-cartao-with-failure:
+        files:
+          format: ofx
+          options:
+            encoding: us-ascii
+            charset: 1252
+          in: ./tests/files/nubank/card_with_failure
+          out: /tmp/ofx_converter/nubank/card_with_failure
+        lang: por
+        cur: brl
+        fi:
+          id: 260
+          org: NU PAGAMENTOS S.A.
+        account:
+          id: 61d7badc-f92a-469a-88b2-41a556f2fb29
+          type: credit-card
+        parser: nubank-ofx
       nubank-conta:
         files:
           format: ofx
