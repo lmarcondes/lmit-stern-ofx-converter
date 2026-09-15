@@ -2,11 +2,11 @@ import re
 from datetime import datetime
 from typing import Callable
 
-from click import argument, group, option
+from click import argument, echo, group, option
 from dateutil.relativedelta import relativedelta
 
 from ofx_converter.logger import get_logger
-from ofx_converter.runner import Runner
+from ofx_converter.runner import ConversionStatus, Runner
 
 logger = get_logger("main")
 
@@ -44,3 +44,14 @@ def convert(
     )
     runner = Runner(account_name)
     results = list(runner.run_account_parsing(parsed_from_date, parsed_to_date))
+
+    converted = [r for r in results if r.status == ConversionStatus.CONVERTED]
+    skipped = [r for r in results if r.status == ConversionStatus.SKIPPED]
+    failed = [r for r in results if r.status == ConversionStatus.FAILED]
+
+    echo(f"Converted: {len(converted)}, Skipped: {len(skipped)}, Failed: {len(failed)}")
+    if failed:
+        echo("Failed files:")
+        for r in failed:
+            echo(f"  {r.input_path.name}: {r.error}")
+        raise SystemExit(1)

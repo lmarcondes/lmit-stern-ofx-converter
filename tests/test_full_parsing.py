@@ -4,7 +4,7 @@ from typing import Callable
 from ofxparse import OfxParser
 
 from ofx_converter.parsing.account_config import AccountConfig
-from ofx_converter.runner import Runner
+from ofx_converter.runner import ConversionStatus, Runner
 from tests.base_test_case import BaseTestCase
 
 
@@ -16,9 +16,9 @@ class TestFullConversion(BaseTestCase):
     def test_full_conversion_csv(self) -> None:
         account_name = "nubank-cartao"
         runner = Runner(account_name)
-        paths = list(runner.run_account_parsing())
-        for x in paths:
-            self.assertIsNotNone(x)
+        results = list(runner.run_account_parsing())
+        for result in results:
+            self.assertEqual(result.status, ConversionStatus.CONVERTED)
 
     def test_full_conversion_csv_with_dates(self) -> None:
         account_name = "nubank-cartao"
@@ -27,14 +27,26 @@ class TestFullConversion(BaseTestCase):
             dt, "%Y-%m"
         )
         from_date, to_date = parse_date("2025-03"), parse_date("2025-04")
-        paths = list(runner.run_account_parsing(from_date, to_date))
-        for path in paths:
-            self.assertIsNotNone(path)
-            if path is not None:
-                with open(path, "rb") as of:
-                    ofx = self._ofx_parser.parse(of)
-                    of.close()
-                self.assertIsNotNone(ofx)
+        results = list(runner.run_account_parsing(from_date, to_date))
+        for result in results:
+            self.assertEqual(result.status, ConversionStatus.CONVERTED)
+            with open(result.output_path, "rb") as of:
+                ofx = self._ofx_parser.parse(of)
+                of.close()
+            self.assertIsNotNone(ofx)
+
+    def test_batch_isolates_failures(self) -> None:
+        runner = Runner("nubank-cartao-with-failure")
+        results = list(runner.run_account_parsing())
+        self.assertEqual(len(results), 2)
+        statuses = {result.status for result in results}
+        self.assertIn(ConversionStatus.FAILED, statuses)
+        self.assertIn(ConversionStatus.CONVERTED, statuses)
+        failed = next(
+            result for result in results if result.status == ConversionStatus.FAILED
+        )
+        self.assertEqual(failed.input_path.name, "2025-06-broken.ofx")
+        self.assertIsNotNone(failed.error)
 
     def test_date_filter(self) -> None:
         account_name = "nubank-cartao"
